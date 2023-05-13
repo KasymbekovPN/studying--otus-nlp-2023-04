@@ -1,4 +1,5 @@
 import requests
+from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -31,6 +32,7 @@ def run_load_task(getter=get_page_raw_data, **kwargs) -> list:
         page_data = getter(url, timeout)
         if page_data['status_code'] == 200:
             result.append(page_data['raw_text'])
+        sleep(period)
 
     return result
 
