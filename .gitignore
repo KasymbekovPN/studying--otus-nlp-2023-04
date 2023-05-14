@@ -1,7 +1,7 @@
 todos
 .idea
 
-*.dump
+*.htm
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

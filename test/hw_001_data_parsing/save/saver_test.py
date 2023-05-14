@@ -28,9 +28,9 @@ class TestCase(unittest.TestCase):
             os.remove(file_name)
 
     @parameterized.expand([
-        ('file_prefix_', 'value0,', 'file_prefix_30fcba6e26b707ca91ac87dbdcb42283.dump'),
-        ('file_prefix_', 'value1,', 'file_prefix_06d6ef84b4ff78a0cddf1eabc5e2eeaa.dump'),
-        ('file_prefix_', 'value2,', 'file_prefix_38b07bfb951740b38f770f505bc9a1a3.dump')
+        ('file_prefix_', 'value0,', 'file_prefix_30fcba6e26b707ca91ac87dbdcb42283.htm'),
+        ('file_prefix_', 'value1,', 'file_prefix_06d6ef84b4ff78a0cddf1eabc5e2eeaa.htm'),
+        ('file_prefix_', 'value2,', 'file_prefix_38b07bfb951740b38f770f505bc9a1a3.htm')
     ])
     def test_file_name_calculation(self, prefix: str, value: str, expected: str):
         result = calculate_file_name(prefix, value)

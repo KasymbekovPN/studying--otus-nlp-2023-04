@@ -3,15 +3,16 @@ import hashlib
 
 def rewrite_file(path: str, content: str) -> bool:
     try:
-        with open(path, 'w') as f:
+        with open(path, 'w', encoding='utf-8') as f:
             f.write(content)
         return True
-    except Exception:
+    except Exception as ex:
+        print(ex)
         return False
 
 
 def calculate_file_name(prefix: str, value: str) -> str:
-    return prefix + str(hashlib.md5(str.encode(value)).hexdigest()) + '.dump'
+    return prefix + str(hashlib.md5(str.encode(value)).hexdigest()) + '.htm'
 
 
 class Saver:

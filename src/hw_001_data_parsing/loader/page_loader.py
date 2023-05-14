@@ -41,9 +41,9 @@ def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
 
 class PageLoader:
     def __init__(self,
-                 feed_page_ds: 'FeedPageDS',
+                 ds: 'DSFeedPageLinks',
                  configurator: 'Configurator') -> None:
-        self._ds = feed_page_ds
+        self._ds = ds
         self._conf = configurator
 
     def execute(self) -> dict:
