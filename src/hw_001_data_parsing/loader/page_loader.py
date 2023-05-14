@@ -59,13 +59,13 @@ class PageLoader:
 
 def run():
     from src.hw_001_data_parsing.configurator.configurator import Configurator
-    from src.hw_001_data_parsing.datasource.feed_page_ds import FeedPageDS
+    from src.hw_001_data_parsing.datasource.ds_feed_page_links import DSFeedPageLinks
 
     configurator = Configurator()
     configurator.thread_amount = 8
     configurator.max_feed_page_amount = 23
 
-    ds = FeedPageDS(configurator)
+    ds = DSFeedPageLinks(configurator)
 
     loader = PageLoader(ds, configurator)
     result = loader.execute()

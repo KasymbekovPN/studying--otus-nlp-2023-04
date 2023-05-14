@@ -16,7 +16,7 @@ def make_replacing(template: str, idx: int) -> str:
     return template.replace('{i}', str(idx + 1))
 
 
-class FeedPageDS:
+class DSFeedPageLinks:
     TEMPLATE = 'https://habr.com/ru/all/page{i}/'
 
     def __init__(self,
@@ -34,7 +34,7 @@ class FeedPageDS:
 
     @link_pack.setter
     def link_pack(self, value):
-        raise Exception('[FeedPageDS] setting unsupported')
+        raise Exception('[DSFeedPageLinks] setting unsupported')
 
 
 if __name__ == '__main__':
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     configurator.thread_amount = 8
     configurator.max_feed_page_amount = 23
 
-    ds = FeedPageDS(configurator)
+    ds = DSFeedPageLinks(configurator)
     for gen in ds.link_pack:
         print('gen: ', gen)
         for link in gen:

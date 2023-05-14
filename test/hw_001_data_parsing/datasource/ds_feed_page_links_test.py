@@ -1,7 +1,7 @@
 from parameterized import parameterized
 import unittest
 
-from src.hw_001_data_parsing.datasource.feed_page_ds import calculate_pack_ranges, make_replacing, FeedPageDS
+from src.hw_001_data_parsing.datasource.ds_feed_page_links import calculate_pack_ranges, make_replacing, DSFeedPageLinks
 from src.hw_001_data_parsing.configurator.configurator import Configurator
 
 
@@ -43,7 +43,7 @@ class TestCase(unittest.TestCase):
         expected_pack_0 = [make_test_replacing('', i) for i in range(0, 7)]
         expected_pack_1 = [make_test_replacing('', i) for i in range(7, 10)]
 
-        ds = FeedPageDS(None, calculate_test_pack_ranges, make_test_replacing)
+        ds = DSFeedPageLinks(None, calculate_test_pack_ranges, make_test_replacing)
         pack = ds.link_pack
 
         self.assertEqual(2, len(pack))
