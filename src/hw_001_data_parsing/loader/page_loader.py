@@ -1,5 +1,6 @@
 import requests
 from time import sleep
+import concurrent.futures
 from concurrent.futures import ThreadPoolExecutor
 
 
@@ -7,7 +8,6 @@ def get_page(url: str, timeout: int) -> 'response':
     return requests.Session().get(url=url, timeout=timeout)
 
 
-# todo must return either text or None
 def get_page_raw_data(url: str, timeout: int, getter=get_page) -> dict:
     response = getter(url, timeout)
     result = {'status_code': response.status_code, 'raw_text': '', 'url': url}
@@ -30,59 +30,48 @@ def run_load_task(getter=get_page_raw_data, **kwargs) -> list:
     result = []
     for url in generator:
         page_data = getter(url, timeout)
-        if page_data['status_code'] == 200:
+        status_code = page_data['status_code']
+        print(f'[{status_code}] URL : {url}')
+        if status_code == 200:
             result.append(page_data['raw_text'])
         sleep(period)
 
     return result
 
 
+class PageLoader:
+    def __init__(self,
+                 feed_page_ds: 'FeedPageDS',
+                 configurator: 'Configurator') -> None:
+        self._ds = feed_page_ds
+        self._conf = configurator
 
-# todo del
-# def get_wiki_page_existence(wiki_page_url, timeout=10):
-#     session = requests.Session()
-#     response = session.get(url=wiki_page_url, timeout=timeout)
-#
-#     # response = requests.get(url=wiki_page_url, timeout=timeout)
-#
-#     page_status = "unknown"
-#     if response.status_code == 200:
-#         page_status = "exists"
-#     elif response.status_code == 404:
-#         page_status = "does not exist"
-#
-#     print(len(response.text))
-#     return wiki_page_url + " - " + page_status
-#
-#
-# wiki_page_urls = [
-#     "https://en.wikipedia.org/wiki/Ocean",
-#     "https://en.wikipedia.org/wiki/Island",
-#     "https://en.wikipedia.org/wiki/this_page_does_not_exist",
-#     "https://en.wikipedia.org/wiki/Shark",
-#     "https://habr.com/ru/all/page1/"
-# ]
-#
-#
-# def run():
-#
-#     x = (x for x in range(0, 10))
-#
-#     import concurrent.futures
-#
-#     # with concurrent.futures.ThreadPoolExecutor() as executor:
-#     #     futures = []
-#     #     for url in wiki_page_urls:
-#     #         futures.append(executor.submit(run_load_task,link_generator=x))
-#     #     for future in concurrent.futures.as_completed(futures):
-#     #         print(future.result())
-#     with ThreadPoolExecutor() as executor:
-#         futures = []
-#         for url in wiki_page_urls:
-#             futures.append(executor.submit(get_wiki_page_existence, wiki_page_url=url))
-#         for future in concurrent.futures.as_completed(futures):
-#             print(future.result())
-#
-#
-# if __name__ == '__main__':
-#     run()
+    def execute(self) -> list:
+        with ThreadPoolExecutor(self._conf.thread_amount) as executor:
+            result = []
+            futures = []
+            for generator in self._ds.link_pack:
+                futures.append(executor.submit(run_load_task, link_generator=generator))
+            for future in concurrent.futures.as_completed(futures):
+                result += future.result()
+        return result
+
+
+def run():
+    from src.hw_001_data_parsing.configurator.configurator import Configurator
+    from src.hw_001_data_parsing.datasource.feed_page_ds import FeedPageDS
+
+    configurator = Configurator()
+    configurator.thread_amount = 8
+    configurator.max_feed_page_amount = 23
+
+    ds = FeedPageDS(configurator)
+
+    loader = PageLoader(ds, configurator)
+    result = loader.execute()
+    print(len(result))
+
+
+if __name__ == '__main__':
+    run()
+    
