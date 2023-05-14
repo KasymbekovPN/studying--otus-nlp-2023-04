@@ -19,21 +19,21 @@ def get_page_raw_data(url: str, timeout: int, getter=get_page) -> dict:
     return result
 
 
-def run_load_task(getter=get_page_raw_data, **kwargs) -> list:
+def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
     if not ('link_generator' in kwargs):
         print('[run_load_task] link_generator is absence')
-        return []
+        return {}
     period = kwargs['period'] if 'period' in kwargs else 0.3
     timeout = kwargs['timeout'] if 'timeout' in kwargs else 10
     generator = kwargs['link_generator']
 
-    result = []
+    result = {}
     for url in generator:
         page_data = getter(url, timeout)
         status_code = page_data['status_code']
         print(f'[{status_code}] URL : {url}')
         if status_code == 200:
-            result.append(page_data['raw_text'])
+            result[url] = page_data['raw_text']
         sleep(period)
 
     return result
@@ -46,14 +46,14 @@ class PageLoader:
         self._ds = feed_page_ds
         self._conf = configurator
 
-    def execute(self) -> list:
+    def execute(self) -> dict:
         with ThreadPoolExecutor(self._conf.thread_amount) as executor:
-            result = []
+            result = {}
             futures = []
             for generator in self._ds.link_pack:
                 futures.append(executor.submit(run_load_task, link_generator=generator))
             for future in concurrent.futures.as_completed(futures):
-                result += future.result()
+                result = {**result, **future.result()}
         return result
 
 
@@ -70,8 +70,9 @@ def run():
     loader = PageLoader(ds, configurator)
     result = loader.execute()
     print(len(result))
+    for k, v in result.items():
+        print(k, ' : ', len(v))
 
 
 if __name__ == '__main__':
     run()
-    

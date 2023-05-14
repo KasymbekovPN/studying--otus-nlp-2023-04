@@ -39,8 +39,8 @@ class TestCase(unittest.TestCase):
 
         result = run_load_task(getter=get_test_page_raw_data, link_generator=generator, timeout=timeout)
 
-        expected = ['text: https://path' + str(i) + '.com' for i in range(0, amount)]
-        self.assertEqual(True, isinstance(result, list))
+        expected = {'https://path' + str(i) + '.com': 'text: https://path' + str(i) + '.com' for i in range(0, amount)}
+        self.assertEqual(True, isinstance(result, dict))
         self.assertEqual(expected, result)
 
 
