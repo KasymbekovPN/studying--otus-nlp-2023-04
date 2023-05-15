@@ -1,4 +1,6 @@
 import hashlib
+from os import listdir, remove
+from os.path import join, isfile
 
 
 def rewrite_file(path: str, content: str) -> bool:
@@ -32,11 +34,28 @@ class Saver:
         self._writer(path, key + '\n' + content)
 
     def save_dict(self, contents: dict) -> None:
+        self._clear_folder()
         for k, v in contents.items():
             self.save(k, v)
 
+    def _clear_folder(self):
+        path = self._folder_path
+        prefix = self._file_prefix
+        files = [f for f in listdir(path) if isfile(join(path, f)) and f[:len(prefix)] == prefix]
+        for f in files:
+            remove(join(path, f))
+
 
 if __name__ == '__main__':
+    # todo del
+    # path = '../../../output/feed_pages'
+    # prefix = 'feed_'
+    # files = [f for f in listdir(path) if isfile(join(path, f)) and f[:len(prefix)] == prefix]
+    # print(files)
+    #
+    # for f in files:
+    #     os.remove(join(path, f))
+
     amount = 10
     d = {'key_' + str(i): 'content ' + str(i) for i in range(0, amount)}
 

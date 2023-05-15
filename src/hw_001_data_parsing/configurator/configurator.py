@@ -3,10 +3,12 @@ class Configurator:
     # todo ??? DEFAULT_OUTPUT_FOLDER_PREFIX + check attributes usage
     DEFAULT_OUTPUT_FOLDER_PREFIX = 'result_'
     DEFAULT_THREAD_AMOUNT = 8
-    DEFAULT_MAX_FEED_PAGE_AMOUNT = 2
+    DEFAULT_MAX_FEED_PAGE_AMOUNT = 1
     DEFAULT_FREQ_TOP = 10
     DEFAULT_REQUEST_PERIOD = 0.3
     DEFAULT_GET_TIMEOUT = 10
+    DEFAULT_FEED_PAGE_FOLDER = '../../output/feed_pages'
+    DEFAULT_FEED_PAGE_PREFIX = 'feed_page_'
 
     def __init__(self) -> None:
         self._output_folder_prefix = self.DEFAULT_OUTPUT_FOLDER_PREFIX
@@ -15,6 +17,8 @@ class Configurator:
         self._freq_top = self.DEFAULT_FREQ_TOP
         self._request_period = self.DEFAULT_REQUEST_PERIOD
         self._get_timeout = self.DEFAULT_GET_TIMEOUT
+        self._feed_page_folder = self.DEFAULT_FEED_PAGE_FOLDER
+        self._feed_page_prefix = self.DEFAULT_FEED_PAGE_PREFIX
 
     @property
     def output_folder_prefix(self):
@@ -63,3 +67,19 @@ class Configurator:
     @get_timeout.setter
     def get_timeout(self, value):
         self._get_timeout = value
+
+    @property
+    def feed_page_folder(self):
+        return self._feed_page_folder
+
+    @feed_page_folder.setter
+    def feed_page_folder(self, value):
+        self._feed_page_folder = value
+
+    @property
+    def feed_page_prefix(self):
+        return self._feed_page_prefix
+
+    @feed_page_prefix.setter
+    def feed_page_prefix(self, value):
+        self._feed_page_prefix = value
