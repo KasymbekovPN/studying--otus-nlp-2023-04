@@ -3,6 +3,7 @@ from src.hw_001_data_parsing.datasource.ds_feed_page_links import DSFeedPageLink
 from src.hw_001_data_parsing.loader.page_loader import PageLoader
 from src.hw_001_data_parsing.loader.dump_loader import DumpLoader
 from src.hw_001_data_parsing.save.saver import Saver
+from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask
 
 
 def get_feed_pages(configurator: 'Configurator'):
@@ -25,8 +26,13 @@ def run():
     # feed_pages = get_feed_pages(configurator)
     feed_pages = get_saved_feed_pages(configurator)
 
-    for k, v in feed_pages.items():
-        print(k, ' - ', len(v))
+    # for k, v in feed_pages.items():
+    #     print(k, ' - ', len(v))
+
+    collect_page_links_task = CollectPageLinksTask('a', 'tm-title__link')
+    Parser().add_task(collect_page_links_task).parse_dict(feed_pages)
+    # print(collect_page_links_task.attrs[collect_page_links_task.KEY])
+    # print(len(collect_page_links_task.attrs[collect_page_links_task.KEY]))
 
 
 if __name__ == '__main__':

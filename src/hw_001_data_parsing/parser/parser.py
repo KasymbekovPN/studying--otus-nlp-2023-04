@@ -2,14 +2,20 @@ from bs4 import BeautifulSoup
 
 
 class CollectPageLinksTask:
+    KEY = 'links'
+
     def __init__(self, tag: str, class_: str) -> None:
         self.attrs = {}
         self._tag = tag
         self._class = class_
 
-    def execute(self, soup: 'BeautifulSoup', key='links'):
+    def execute(self, key: str, soup: 'BeautifulSoup') -> 'CollectPageLinksTask':
         els = soup.find_all(self._tag, self._class)
-        self.attrs[key] = [el.attrs['href'] for el in els]
+        if self.KEY in self.attrs:
+            self.attrs[self.KEY] += [el.attrs['href'] for el in els]
+        else:
+            self.attrs[self.KEY] = [el.attrs['href'] for el in els]
+        print(f'[CollectPageLinksTask] links amount is {len(self.attrs[self.KEY])}')
         return self
 
 
@@ -21,33 +27,13 @@ class Parser:
         self._tasks.append(task)
         return self
 
-    def parse(self, content: str, key: str):
-        pass
+    def parse(self, key: str, content: str) -> 'Parser':
+        soup = BeautifulSoup(content, 'html.parser')
+        for task in self._tasks:
+            task.execute(key, soup)
+        return self
 
-    def parse_dict(self, content: dict):
-        pass
-
-#  todo del
-# if __name__ == '__main__':
-#     from src.hw_001_data_parsing.loader.dump_loader import DumpLoader
-#     loader = DumpLoader('../../../output/feed_pages', 'feed_page_')
-#     result = loader.load()
-#
-#     # for k, v in result.items():
-#     #     soup = BeautifulSoup(v, 'html.parser')
-#     #     # print(soup)
-#     #     els = soup.find_all('a', class_='tm-title__link')
-#     #     print(len(els))
-#     #     for el in els:
-#     #         print(10*'-')
-#     #         print(el)
-#     #         print(el.attrs['href'])
-#     #         print(el.next)
-#     #         print(el.next.text)
-#
-#     # els = soup.find_all('a', class_='x-product-card__link')
-#
-#     # tm-title__link
-#
-#     # saver = Saver('../../../output/feed_pages', 'prefix_')
-#     pass
+    def parse_dict(self, content: dict) -> 'Parser':
+        for k, v in content.items():
+            self.parse(k, v)
+        return self
