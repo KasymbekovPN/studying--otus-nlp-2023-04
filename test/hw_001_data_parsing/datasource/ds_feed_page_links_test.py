@@ -4,7 +4,7 @@ import unittest
 from src.hw_001_data_parsing.datasource.ds_feed_page_links import calculate_pack_ranges, make_replacing, DSFeedPageLinks
 from src.hw_001_data_parsing.configurator.configurator import Configurator
 
-
+# todo del
 class TestCase(unittest.TestCase):
 
     @parameterized.expand([

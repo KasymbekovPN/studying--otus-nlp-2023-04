@@ -1,4 +1,6 @@
 
+
+# todo del
 def calculate_pack_ranges(configurator: 'Configurator') -> list:
     thread_amount = configurator.thread_amount
     page_amount = configurator.max_feed_page_amount
@@ -11,11 +13,12 @@ def calculate_pack_ranges(configurator: 'Configurator') -> list:
 
     return result
 
-
+# todo del
 def make_replacing(template: str, idx: int) -> str:
     return template.replace('{i}', str(idx + 1))
 
 
+# todo rename to LinkHolder + use (thread + link) size + link_source as constructor arg
 class DSFeedPageLinks:
     TEMPLATE = 'https://habr.com/ru/all/page{i}/'
 

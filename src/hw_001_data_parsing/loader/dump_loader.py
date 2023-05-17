@@ -2,11 +2,13 @@ from os.path import isfile, join
 from os import listdir
 
 
+# use function
 class SuitableFileNameGetter:
     def execute(self, folder_path: str, prefix: str) -> list:
         return [f for f in listdir(folder_path) if isfile(join(folder_path, f)) and f[:len(prefix)] == prefix]
 
 
+# use function
 class FilesLoader:
     def execute(self, folder_path: str, files: list) -> dict:
         result = {}

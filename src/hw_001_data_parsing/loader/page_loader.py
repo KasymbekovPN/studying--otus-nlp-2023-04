@@ -19,6 +19,7 @@ def get_page_raw_data(url: str, timeout: int, getter=get_page) -> dict:
     return result
 
 
+# todo rename link_generator
 def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
     if not ('link_generator' in kwargs):
         print('[run_load_task] link_generator is absence')
