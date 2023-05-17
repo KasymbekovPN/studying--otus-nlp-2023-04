@@ -19,14 +19,13 @@ def get_page_raw_data(url: str, timeout: int, getter=get_page) -> dict:
     return result
 
 
-# todo rename link_generator
 def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
-    if not ('link_generator' in kwargs):
-        print('[run_load_task] link_generator is absence')
+    if not ('link_pack' in kwargs):
+        print('[run_load_task] link_pack is absence')
         return {}
     period = kwargs['period'] if 'period' in kwargs else 0.3
     timeout = kwargs['timeout'] if 'timeout' in kwargs else 10
-    generator = kwargs['link_generator']
+    generator = kwargs['link_pack']
 
     result = {}
     for url in generator:
@@ -42,34 +41,32 @@ def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
 
 class PageLoader:
     def __init__(self,
-                 ds: 'DSFeedPageLinks',
-                 configurator: 'Configurator') -> None:
+                 ds: 'LinksDS',
+                 threads_quantity: int) -> None:
         self._ds = ds
-        self._conf = configurator
+        self._threads_quantity = threads_quantity
 
-    def execute(self) -> dict:
-        with ThreadPoolExecutor(self._conf.thread_amount) as executor:
+    def __call__(self, *args, **kwargs):
+        with ThreadPoolExecutor(self._threads_quantity) as executor:
             result = {}
             futures = []
-            for generator in self._ds.link_pack:
-                futures.append(executor.submit(run_load_task, link_generator=generator))
+            for link_pack in self._ds.link_packs:
+                futures.append(executor.submit(run_load_task, link_pack=link_pack))
             for future in concurrent.futures.as_completed(futures):
                 result = {**result, **future.result()}
         return result
 
 
 def run():
-    from src.hw_001_data_parsing.configurator.configurator import Configurator
-    from src.hw_001_data_parsing.datasource.links_ds import DSFeedPageLinks
+    from src.hw_001_data_parsing.datasource.links_ds import LinksDS
+    from src.hw_001_data_parsing.datasource.links_source import FeedLinksCreator
 
-    configurator = Configurator()
-    configurator.thread_amount = 8
-    configurator.max_feed_page_amount = 23
+    threads_quantity = 8
+    link_creator = FeedLinksCreator(23)
+    ds = LinksDS(threads_quantity, link_creator)
 
-    ds = DSFeedPageLinks(configurator)
-
-    loader = PageLoader(ds, configurator)
-    result = loader.execute()
+    loader = PageLoader(ds, threads_quantity)
+    result = loader()
     print(len(result))
     for k, v in result.items():
         print(k, ' : ', len(v))
