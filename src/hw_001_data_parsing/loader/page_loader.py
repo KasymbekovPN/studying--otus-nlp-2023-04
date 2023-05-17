@@ -60,7 +60,7 @@ class PageLoader:
 
 def run():
     from src.hw_001_data_parsing.configurator.configurator import Configurator
-    from src.hw_001_data_parsing.datasource.ds_feed_page_links import DSFeedPageLinks
+    from src.hw_001_data_parsing.datasource.links_ds import DSFeedPageLinks
 
     configurator = Configurator()
     configurator.thread_amount = 8

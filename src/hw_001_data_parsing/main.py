@@ -1,5 +1,5 @@
 from src.hw_001_data_parsing.configurator.configurator import Configurator
-from src.hw_001_data_parsing.datasource.ds_feed_page_links import DSFeedPageLinks
+from src.hw_001_data_parsing.datasource.links_ds import DSFeedPageLinks
 from src.hw_001_data_parsing.loader.page_loader import PageLoader
 from src.hw_001_data_parsing.loader.dump_loader import DumpLoader
 from src.hw_001_data_parsing.save.saver import Saver
