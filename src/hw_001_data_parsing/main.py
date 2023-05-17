@@ -1,5 +1,6 @@
 from src.hw_001_data_parsing.configurator.configurator import Configurator
-from src.hw_001_data_parsing.datasource.links_ds import DSFeedPageLinks
+from src.hw_001_data_parsing.datasource.links_source import FeedLinksCreator
+from src.hw_001_data_parsing.datasource.links_ds import LinksDS
 from src.hw_001_data_parsing.loader.page_loader import PageLoader
 from src.hw_001_data_parsing.loader.dump_loader import DumpLoader
 from src.hw_001_data_parsing.save.saver import Saver
@@ -7,9 +8,11 @@ from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask
 
 
 def get_feed_pages(configurator: 'Configurator'):
-    ds_feed_page_links = DSFeedPageLinks(configurator)
-    loader = PageLoader(ds_feed_page_links, configurator)
-    result = loader.execute()
+    link_creator = FeedLinksCreator(configurator.max_feed_page_amount)
+    ds = LinksDS(configurator.thread_amount, link_creator)
+
+    loader = PageLoader(ds, configurator.thread_amount)
+    result = loader()
     saver = Saver(configurator.feed_page_folder, configurator.feed_page_prefix)
     saver.save_dict(result)
 
@@ -31,8 +34,8 @@ def run():
 
     collect_page_links_task = CollectPageLinksTask('a', 'tm-title__link')
     Parser().add_task(collect_page_links_task).parse_dict(feed_pages)
-    # print(collect_page_links_task.attrs[collect_page_links_task.KEY])
-    # print(len(collect_page_links_task.attrs[collect_page_links_task.KEY]))
+    print(collect_page_links_task.attrs[collect_page_links_task.KEY])
+    print(len(collect_page_links_task.attrs[collect_page_links_task.KEY]))
 
 
 if __name__ == '__main__':
