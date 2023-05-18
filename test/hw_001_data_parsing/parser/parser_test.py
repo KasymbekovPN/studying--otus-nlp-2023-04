@@ -1,7 +1,7 @@
 import unittest
 from bs4 import BeautifulSoup
 
-from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask, CollectPublishedDatetime
+from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask, CollectPublishedDatetime, CollectViewCounter
 
 
 class TestCase(unittest.TestCase):
@@ -108,7 +108,7 @@ class TestCase(unittest.TestCase):
 
         self.assertEqual(expected_links, task.attrs[task.KEY])
 
-    def test_collect_datetime(self):
+    def test_collect_datetime_task(self):
         expected_datetime = '2023-01-23T11:31:09.000Z'
         expected_key = 'some.key'
         class_ = 'tm-article-datetime-published'
@@ -128,6 +128,20 @@ class TestCase(unittest.TestCase):
 
         self.assertEqual(True, expected_key in task.attrs)
         self.assertEqual(expected_datetime, task.attrs[expected_key])
+
+    def test_collect_view_counter_task(self):
+        class_ = 'tm-icon-counter__value'
+        expected_count = '2.1K'
+        expected_key = 'some.key'
+
+        page = f'<div><span class="tm-icon-counter__value">{expected_count}</span></div>'
+        soup = BeautifulSoup(page, 'html.parser')
+
+        task = CollectViewCounter('span', class_)
+        task.execute(expected_key, soup)
+
+        self.assertEqual(True, expected_key in task.attrs)
+        self.assertEqual(expected_count, task.attrs[expected_key])
 
 
 if __name__ == '__main__':
