@@ -2,13 +2,17 @@
 class Configurator:
     # todo ??? DEFAULT_OUTPUT_FOLDER_PREFIX + check attributes usage
     DEFAULT_OUTPUT_FOLDER_PREFIX = 'result_'
+    # todo rename
     DEFAULT_THREAD_AMOUNT = 8
-    DEFAULT_MAX_FEED_PAGE_AMOUNT = 3
+    DEFAULT_MAX_FEED_PAGE_AMOUNT = 1
     DEFAULT_FREQ_TOP = 10
     DEFAULT_REQUEST_PERIOD = 0.3
     DEFAULT_GET_TIMEOUT = 10
     DEFAULT_FEED_PAGE_FOLDER = '../../output/feed_pages'
     DEFAULT_FEED_PAGE_PREFIX = 'feed_page_'
+
+    DEFAULT_ARTICLES_PAGE_FOLDER = '../../output/article_pages'
+    DEFAULT_ARTICLES_PAGE_PREFIX = 'article_page_'
 
     def __init__(self) -> None:
         self._output_folder_prefix = self.DEFAULT_OUTPUT_FOLDER_PREFIX

@@ -1,7 +1,7 @@
 import unittest
 from bs4 import BeautifulSoup
 
-from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask
+from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask, CollectPublishedDatetime
 
 
 class TestCase(unittest.TestCase):
@@ -107,6 +107,27 @@ class TestCase(unittest.TestCase):
             .execute('', BeautifulSoup(page1, 'html.parser'))
 
         self.assertEqual(expected_links, task.attrs[task.KEY])
+
+    def test_collect_datetime(self):
+        expected_datetime = '2023-01-23T11:31:09.000Z'
+        expected_key = 'some.key'
+        class_ = 'tm-article-datetime-published'
+
+        page = f"""
+        <div>
+            <span class="tm-article-datetime-published">
+                <time datetime="{expected_datetime}" title="2023-01-23, 14:31">
+                    23  янв   в 14:31
+                </time>
+            </span>
+        </div>"""
+        soup = BeautifulSoup(page, 'html.parser')
+
+        task = CollectPublishedDatetime('span', class_)
+        task.execute(expected_key, soup)
+
+        self.assertEqual(True, expected_key in task.attrs)
+        self.assertEqual(expected_datetime, task.attrs[expected_key])
 
 
 if __name__ == '__main__':

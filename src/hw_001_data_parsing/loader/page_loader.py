@@ -46,7 +46,7 @@ class PageLoader:
         self._ds = ds
         self._threads_quantity = threads_quantity
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args, **kwargs) -> dict:
         with ThreadPoolExecutor(self._threads_quantity) as executor:
             result = {}
             futures = []
