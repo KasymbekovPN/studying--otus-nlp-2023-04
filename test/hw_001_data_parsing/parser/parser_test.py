@@ -1,8 +1,8 @@
 import unittest
 from bs4 import BeautifulSoup
 
-from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask, CollectPublishedDatetime, \
-    CollectViewCounter, CollectArticleTask
+from src.hw_001_data_parsing.parser.parser import Parser, CollectPageLinksTask, CollectPublishedDatetimeTask, \
+    CollectViewCounterTask, CollectArticleTask
 
 
 class TestCase(unittest.TestCase):
@@ -124,7 +124,7 @@ class TestCase(unittest.TestCase):
         </div>"""
         soup = BeautifulSoup(page, 'html.parser')
 
-        task = CollectPublishedDatetime('span', class_)
+        task = CollectPublishedDatetimeTask('span', class_)
         task.execute(expected_key, soup)
 
         self.assertEqual(True, expected_key in task.attrs)
@@ -138,7 +138,7 @@ class TestCase(unittest.TestCase):
         page = f'<div><span class="tm-icon-counter__value">{expected_count}</span></div>'
         soup = BeautifulSoup(page, 'html.parser')
 
-        task = CollectViewCounter('span', class_)
+        task = CollectViewCounterTask('span', class_)
         task.execute(expected_key, soup)
 
         self.assertEqual(True, expected_key in task.attrs)
@@ -146,7 +146,8 @@ class TestCase(unittest.TestCase):
 
     def test_collect_article_task(self):
         expected_key = 'some.key'
-        words = [f'word{w}' for w in range(0, 14)]
+        words = [f'Word{w}' for w in range(0, 14)]
+        expected_words = [w.lower() for w in words]
         page = f"""
         <div>
             <div class="article-formatted-body article-formatted-body article-formatted-body_version-2">
@@ -174,7 +175,7 @@ class TestCase(unittest.TestCase):
 
         expected_text = ''
         delimiter = ''
-        for w in words:
+        for w in expected_words:
             expected_text += delimiter + w
             delimiter = ' '
         self.assertEqual(True, expected_key in task.attrs)

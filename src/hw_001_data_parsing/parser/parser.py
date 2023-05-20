@@ -1,7 +1,6 @@
 import re
 
 from bs4 import BeautifulSoup
-from datetime import datetime
 
 
 class CollectPageLinksTask:
@@ -20,26 +19,26 @@ class CollectPageLinksTask:
         return self
 
 
-class CollectPublishedDatetime:
+class CollectPublishedDatetimeTask:
     def __init__(self, tag: str, class_: str):
         self.attrs = {}
         self._tag = tag
         self._class = class_
 
-    def execute(self, key: str, soup: 'BeautifulSoup') -> 'CollectPublishedDatetime':
+    def execute(self, key: str, soup: 'BeautifulSoup') -> 'CollectPublishedDatetimeTask':
         el = soup.find(self._tag, class_=self._class)
         t = el.find('time')
         self.attrs[key] = t.attrs['datetime']
         return self
 
 
-class CollectViewCounter:
+class CollectViewCounterTask:
     def __init__(self, tag: str, class_: str):
         self.attrs = {}
         self._tag = tag
         self._class = class_
 
-    def execute(self, key: str, soup: 'BeautifulSoup') -> 'CollectViewCounter':
+    def execute(self, key: str, soup: 'BeautifulSoup') -> 'CollectViewCounterTask':
         el = soup.find(self._tag, class_=self._class)
         self.attrs[key] = el.text
         return self
@@ -56,7 +55,7 @@ class CollectArticleTask:
         text = re.sub(r'<[0-9a-zA-Z="_:/. -]+>', ' ', el.text)
         text = re.sub(r'</[a-zA-Z]+>', ' ', text)
         text = re.sub(r'\W+', ' ', text)
-        self.attrs[key] = text.strip()
+        self.attrs[key] = text.strip().lower()
         return self
 
 
@@ -78,24 +77,3 @@ class Parser:
         for k, v in content.items():
             self.parse(k, v)
         return self
-
-
-if __name__ == '__main__':
-    pass
-    # page = '<div><p class="x0 x1 x2"></p></div>'
-    #
-    # s = BeautifulSoup(page, 'html.parser')
-    # els = s.find_all('p', class_='x0')
-    # print(els)
-
-    # page = '<div><span class="tm-article-datetime-published"><time datetime="2023-01-23T11:31:09.000Z" title="2023-01-23, ' \
-    #        '14:31">23  янв   в 14:31</time></span></div>'
-    # soup = BeautifulSoup(page, 'html.parser')
-    # r = soup.find('span', class_='tm-article-datetime-published')
-    # s = r.next.attrs['datetime']
-    # print(s)
-    # # print(datetime.strptime(s, '%Y/%m/%d %H:%M:%S.%f'))
-    #
-    # print(datetime.now())
-    # x = datetime(2001, 1, 2, 10, 11, 12)
-    # print(x)

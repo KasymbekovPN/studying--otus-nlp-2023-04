@@ -14,6 +14,8 @@ class Configurator:
     DEFAULT_ARTICLES_PAGE_FOLDER = '../../output/article_pages'
     DEFAULT_ARTICLES_PAGE_PREFIX = 'article_page_'
 
+    DEFAULT_DATASET_FOLDER = '../../output/dataset'
+
     def __init__(self) -> None:
         self._output_folder_prefix = self.DEFAULT_OUTPUT_FOLDER_PREFIX
         self._thread_amount = self.DEFAULT_THREAD_AMOUNT

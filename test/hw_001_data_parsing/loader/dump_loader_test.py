@@ -1,49 +1,62 @@
 import unittest
 
-from src.hw_001_data_parsing.loader.dump_loader import SuitableFileNameGetter, FilesLoader, DumpLoader
+from os.path import join
+from src.hw_001_data_parsing.loader.dump_loader import DumpSuitableFileNamesComputer, DatasetSuitableFileNamesComputer,\
+    DumpFilesReader, DatasetFilesReader, DumpReader
 
 
 class TestCase(unittest.TestCase):
-    def test_suitable_file_name_getter(self):
+
+    def test_dump_suitable_name_computer(self):
         folder_path = 'test_files'
         prefix = 'tf'
 
-        result = SuitableFileNameGetter().execute(folder_path, prefix)
+        result = DumpSuitableFileNamesComputer(folder_path, prefix)()
         self.assertEqual(['tf0.txt', 'tf1.txt'], result)
 
-    def test_files_loader(self):
+    def test_dataset_suitable_name_computer(self):
+        folder_path = 'test_files'
+        name = 'dataset.csv'
+
+        result = DatasetSuitableFileNamesComputer(folder_path, name)()
+        self.assertEqual([join(folder_path, name)], result)
+
+    def test_dump_file_reader(self):
         folder_path = 'test_files'
         files = ['tf0.txt', 'tf1.txt']
         expected = {'key0': 'value0', 'key1': 'value1'}
 
-        result = FilesLoader().execute(folder_path, files)
+        result = DumpFilesReader(folder_path)(files=files)
         self.assertEqual(expected, result)
 
-    def test_dump_loader(self):
+    def test_dataset_file_reader(self):
         folder_path = 'test_files'
-        prefix = 'tf'
-        files = ['tf0.txt', 'tf1.txt']
-        expected = {'key0': 'value0', 'key1': 'value1'}
+        file_name = 'dataset.csv'
+        files = [file_name]
+        expected_data = {'id0': {'view_counter': 'view_counter0', 'datetime': 'datetime0', 'article': 'article0'},
+                         'id1': {'view_counter': 'view_counter1', 'datetime': 'datetime1', 'article': 'article1'}}
 
-        class TestGetter:
-            def execute(self, folder_path: str, prefix: str) -> list:
-                self.fp = folder_path
-                self.p = prefix
-                return files
+        result = DatasetFilesReader(folder_path)(files=files)
+        self.assertEqual(expected_data, result[file_name])
 
-        class TestLoader:
-            def execute(self, folder_path: str, files: list) -> dict:
-                self.fp = folder_path
-                self.fs = files
-                return expected
+    def test_dump_reader(self):
+        quantity = 10
+        files = [f'file_path{i}' for i in range(0, quantity)]
+        expected = {f: f for f in files}
 
-        getter = TestGetter()
-        loader = TestLoader()
-        result = DumpLoader(folder_path, prefix, file_getter=getter, loader=loader).load()
-        self.assertEqual(folder_path, getter.fp)
-        self.assertEqual(prefix, getter.p)
-        self.assertEqual(folder_path, loader.fp)
-        self.assertEqual(files, loader.fs)
+        class TestNamesComputer:
+            def __init__(self, fs):
+                self._files = fs
+
+            def __call__(self, *args, **kwargs) -> list:
+                return self._files
+
+        class TestReader:
+            def __call__(self, *args, **kwargs):
+                files = kwargs.get('files')
+                return {f: f for f in files}
+
+        result = DumpReader(TestNamesComputer(files), TestReader())()
         self.assertEqual(expected, result)
 
 
