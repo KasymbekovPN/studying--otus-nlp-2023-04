@@ -2,11 +2,12 @@ from src.hw_001_data_parsing.configurator.configurator import Configurator
 from src.hw_001_data_parsing.datasource.links_ds import LinksDS
 from src.hw_001_data_parsing.datasource.links_source import FeedLinksCreator, PerforatingLinkCreator
 from src.hw_001_data_parsing.loader.page_loader import PageLoader
-from src.hw_001_data_parsing.loader.dump_loader import DumpReader, DumpFilesReader, DatasetFilesReader, DatasetSuitableFileNamesComputer, DumpSuitableFileNamesComputer
+from src.hw_001_data_parsing.loader.dump_loader import DumpReader, DumpFilesReader, DatasetFilesReader, \
+    DatasetSuitableFileNamesComputer, DumpSuitableFileNamesComputer
 from src.hw_001_data_parsing.parser.collector import Collector
 from src.hw_001_data_parsing.parser.parser import CollectPageLinksTask, Parser, CollectPublishedDatetimeTask, \
     CollectViewCounterTask, CollectArticleTask
-from src.hw_001_data_parsing.save.content_holder import ContentHolder, DatasetContentHolder, PageContentHolder
+from src.hw_001_data_parsing.save.content_holder import DatasetContentHolder, PageContentHolder
 from src.hw_001_data_parsing.save.saver import Saver
 
 
@@ -30,8 +31,12 @@ def get_saved_feed_pages(configurator: 'Configurator') -> dict:
     return reader()
 
 
-def get_article_pages(configurator: 'Configurator', links: list) -> dict:
-    link_creator = PerforatingLinkCreator(links)
+def get_article_pages(configurator: 'Configurator', feed_pages: dict) -> dict:
+    collect_page_links_task = CollectPageLinksTask('a', 'tm-title__link')
+    Parser().add_task(collect_page_links_task).parse_dict(feed_pages)
+    article_links = collect_page_links_task.attrs[collect_page_links_task.KEY]
+
+    link_creator = PerforatingLinkCreator(article_links)
     ds = LinksDS(configurator.thread_amount, link_creator)
 
     loader = PageLoader(ds, configurator.thread_amount)
@@ -91,16 +96,7 @@ def run():
     configurator = Configurator()
 
     feed_pages = get_saved_feed_pages(configurator) if FEED_PAGES_FROM_DUMP else get_feed_pages(configurator)
-
-    if ARTICLE_PAGES_FROM_DUMP:
-        article_pages = get_saved_article_pages(configurator)
-    else:
-        pass
-        collect_page_links_task = CollectPageLinksTask('a', 'tm-title__link')
-        Parser().add_task(collect_page_links_task).parse_dict(feed_pages)
-        article_links = collect_page_links_task.attrs[collect_page_links_task.KEY]
-        article_pages = get_article_pages(configurator, article_links)
-
+    article_pages = get_saved_article_pages(configurator) if ARTICLE_PAGES_FROM_DUMP else get_article_pages(configurator, feed_pages)
     dataset = get_saved_dataset(configurator) if DATASET_FROM_DUMP else get_dataset(configurator, article_pages)
 
     print('')
