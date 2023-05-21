@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 def get_page(url: str, timeout: int) -> 'response':
-    return requests.Session().get(url=url, timeout=timeout)
+    return requests.Session().get(url=url, timeout=timeout, allow_redirects=False)
 
 
 def get_page_raw_data(url: str, timeout: int, getter=get_page) -> dict:
@@ -23,12 +23,12 @@ def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
     if not ('link_pack' in kwargs):
         print('[run_load_task] link_pack is absence')
         return {}
-    period = kwargs['period'] if 'period' in kwargs else 0.3
+    period = kwargs['period'] if 'period' in kwargs else 1
     timeout = kwargs['timeout'] if 'timeout' in kwargs else 10
-    generator = kwargs['link_pack']
+    urls = kwargs['link_pack']
 
     result = {}
-    for url in generator:
+    for url in urls:
         page_data = getter(url, timeout)
         status_code = page_data['status_code']
         print(f'[{status_code}] URL : {url}')
@@ -42,16 +42,20 @@ def run_load_task(getter=get_page_raw_data, **kwargs) -> dict:
 class PageLoader:
     def __init__(self,
                  ds: 'LinksDS',
-                 threads_quantity: int) -> None:
+                 threads_quantity: int,
+                 period: int,
+                 timeout: int) -> None:
         self._ds = ds
         self._threads_quantity = threads_quantity
+        self._period = period
+        self._timeout = timeout
 
     def __call__(self, *args, **kwargs) -> dict:
         with ThreadPoolExecutor(self._threads_quantity) as executor:
             result = {}
             futures = []
             for link_pack in self._ds.link_packs:
-                futures.append(executor.submit(run_load_task, link_pack=link_pack))
+                futures.append(executor.submit(run_load_task, link_pack=link_pack, period=self._period, timeout=self._timeout))
             for future in concurrent.futures.as_completed(futures):
                 result = {**result, **future.result()}
         return result

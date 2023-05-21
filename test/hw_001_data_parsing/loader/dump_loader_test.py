@@ -53,8 +53,7 @@ class TestCase(unittest.TestCase):
 
         class TestReader:
             def __call__(self, *args, **kwargs):
-                files = kwargs.get('files')
-                return {f: f for f in files}
+                return {f: f for f in kwargs.get('files')}
 
         result = DumpReader(TestNamesComputer(files), TestReader())()
         self.assertEqual(expected, result)

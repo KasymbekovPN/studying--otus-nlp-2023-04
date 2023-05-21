@@ -13,22 +13,21 @@ from src.hw_001_data_parsing.eda.eda_executor import EDAExecutor, MostViewedArti
 
 
 def get_feed_pages(configurator: 'Configurator') -> dict:
-    link_creator = FeedLinksCreator(configurator.max_feed_page_amount)
-    ds = LinksDS(configurator.thread_amount, link_creator)
+    link_creator = FeedLinksCreator(configurator('quantity.feed-pages'))
+    ds = LinksDS(configurator('quantity.thread'), link_creator)
 
-    loader = PageLoader(ds, configurator.thread_amount)
+    loader = PageLoader(ds, configurator('quantity.thread'), configurator('download.period'), configurator('download.timeout'))
     result = loader()
 
-    holder = PageContentHolder(result, configurator.feed_page_folder, configurator.feed_page_prefix)
+    holder = PageContentHolder(result, configurator('path.feed-page'), configurator('prefix.feed-page'))
     Saver().save(holder)
 
     return result
 
 
 def get_saved_feed_pages(configurator: 'Configurator') -> dict:
-    folder_path = configurator.feed_page_folder
-    prefix = configurator.feed_page_prefix
-    reader = DumpReader(DumpSuitableFileNamesComputer(folder_path, prefix), DumpFilesReader(folder_path))
+    folder_path = configurator('path.feed-page')
+    reader = DumpReader(DumpSuitableFileNamesComputer(folder_path, configurator('prefix.feed-page')), DumpFilesReader(folder_path))
     return reader()
 
 
@@ -38,20 +37,20 @@ def get_article_pages(configurator: 'Configurator', feed_pages: dict) -> dict:
     article_links = collect_page_links_task.attrs[collect_page_links_task.KEY]
 
     link_creator = PerforatingLinkCreator(article_links)
-    ds = LinksDS(configurator.thread_amount, link_creator)
+    ds = LinksDS(configurator('quantity.thread'), link_creator)
 
-    loader = PageLoader(ds, configurator.thread_amount)
+    loader = PageLoader(ds, configurator('quantity.thread'), configurator('download.period'), configurator('download.timeout'))
     result = loader()
 
-    holder = PageContentHolder(result, configurator.DEFAULT_ARTICLES_PAGE_FOLDER, configurator.DEFAULT_ARTICLES_PAGE_PREFIX)
+    holder = PageContentHolder(result, configurator('path.article-page'), configurator('prefix.article-page'))
     Saver().save(holder)
 
     return result
 
 
 def get_saved_article_pages(configurator: 'Configurator') -> dict:
-    folder_path = configurator.DEFAULT_ARTICLES_PAGE_FOLDER
-    prefix = configurator.DEFAULT_ARTICLES_PAGE_PREFIX
+    folder_path = configurator('path.article-page')
+    prefix = configurator('prefix.article-page')
     reader = DumpReader(DumpSuitableFileNamesComputer(folder_path, prefix), DumpFilesReader(folder_path))
     return reader()
 
@@ -72,14 +71,14 @@ def get_dataset(configurator: 'Configurator', article_pages: dict) -> dict:
         .add('article', collect_article_task.attrs)\
         .get()
 
-    holder = DatasetContentHolder(dataset, configurator.DEFAULT_DATASET_FOLDER)
+    holder = DatasetContentHolder(dataset, configurator('path.dataset'))
     Saver().save(holder)
 
     return dataset
 
 
 def get_saved_dataset(configurator: 'Configurator') -> dict:
-    folder_path = configurator.DEFAULT_DATASET_FOLDER
+    folder_path = configurator('path.dataset')
     reader = DumpReader(DatasetSuitableFileNamesComputer(folder_path), DatasetFilesReader(folder_path))
     result = {}
     for k, v in reader().items():
@@ -101,25 +100,15 @@ def print_most_frequent(task):
         print(k, ': ', v)
 
 
-FEED_PAGES_FROM_DUMP = True
-ARTICLE_PAGES_FROM_DUMP = True
-DATASET_FROM_DUMP = True
-
-MOST_VIEWED_QUANTITY = 10
-MOST_FREQUENT_WORDS_QUANTITY = 10
-
-EXCLUDED_WORDS = ['в', 'на', 'с']
-
-
 def run():
-    configurator = Configurator()
+    conf = Configurator()
 
-    feed_pages = get_saved_feed_pages(configurator) if FEED_PAGES_FROM_DUMP else get_feed_pages(configurator)
-    article_pages = get_saved_article_pages(configurator) if ARTICLE_PAGES_FROM_DUMP else get_article_pages(configurator, feed_pages)
-    dataset = get_saved_dataset(configurator) if DATASET_FROM_DUMP else get_dataset(configurator, article_pages)
+    feed_pages = get_saved_feed_pages(conf) if conf('source.take-from-dump.feed-page') else get_feed_pages(conf)
+    article_pages = get_saved_article_pages(conf) if conf('source.take-from-dump.article-page') else get_article_pages(conf, feed_pages)
+    dataset = get_saved_dataset(conf) if conf('source.take-from-dump.dataset') else get_dataset(conf, article_pages)
 
-    most_viewed_task = MostViewedArticlesTask(MOST_VIEWED_QUANTITY)
-    most_freq_words = MostFrequentWordsTask(MOST_FREQUENT_WORDS_QUANTITY, EXCLUDED_WORDS)
+    most_viewed_task = MostViewedArticlesTask(conf('task.most-viewed.top-quantity'))
+    most_freq_words = MostFrequentWordsTask(conf('task.most-freq-words.top-quantity'), conf('task.most-freq-words.excluded'))
     EDAExecutor(dataset)\
         .add_task(most_viewed_task)\
         .add_task(most_freq_words)\
