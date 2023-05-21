@@ -57,7 +57,7 @@ class MostFrequentWordsTask:
                  top_size=10,
                  excluded=None):
         self.top_size = top_size
-        self._excluded = excluded if excluded is not None else []
+        self.excluded = excluded if excluded is not None else []
         self.result = {self.KEY: {}}
 
     def __call__(self, *args, **kwargs):
@@ -67,7 +67,7 @@ class MostFrequentWordsTask:
             article = value['article']
             words = article.split(' ')
             for word in words:
-                if word in self._excluded:
+                if word in self.excluded:
                     continue
                 if word in word_counters:
                     word_counters[word] += 1
