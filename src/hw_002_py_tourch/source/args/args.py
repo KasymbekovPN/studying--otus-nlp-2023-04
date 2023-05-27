@@ -1,7 +1,7 @@
 import random
 
 
-class FloatRandomArgs:
+class Args:
     def __init__(self,
                  min_border: float,
                  max_border: float,
@@ -12,3 +12,7 @@ class FloatRandomArgs:
 
     def __call__(self, *args, **kwargs) -> tuple:
         return tuple([random.uniform(self._min_border, self._max_border) for i in range(0, self._quantity)])
+
+    @property
+    def quantity(self):
+        pass
