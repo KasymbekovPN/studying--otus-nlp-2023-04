@@ -1,14 +1,22 @@
 
 class Args:
-    DEFAULT_AND_MIN_QUANTITY = 1
+    DEFAULT_QUANTITY = 1
+    TYPES_MISMATCH_EXCEPTION_MSG = 'Mismatching of types'
 
     def __init__(self,
-                 arg_range) -> None:
+                 arg_range,
+                 arg_generator) -> None:
         self._arg_range = arg_range
+        self._arg_generator = arg_generator
 
     def __call__(self, *args, **kwargs) -> tuple:
-        pass
-        # return tuple([random.uniform(self._min_border, self._max_border) for i in range(0, self._quantity)])
+        if self._arg_generator.type != self._arg_range.type:
+            raise Exception(self.TYPES_MISMATCH_EXCEPTION_MSG)
+
+        quantity = self._check_and_get_quantity(*args)
+        return self._arg_generator(self._arg_range, quantity)
 
     def _check_and_get_quantity(self, *args) -> int:
-        pass
+        return args[0]\
+            if len(args) > 0 and isinstance(args[0], int) and args[0] > self.DEFAULT_QUANTITY\
+            else self.DEFAULT_QUANTITY

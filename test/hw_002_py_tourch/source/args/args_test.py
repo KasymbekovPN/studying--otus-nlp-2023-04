@@ -5,41 +5,64 @@ from src.hw_002_py_tourch.source.args.args import Args
 
 
 class TestCase(unittest.TestCase):
-    pass
 
-    # todo del
-    # @parameterized.expand([
-    #     (0.0, -1.0, 0.0, 1.0),
-    #     (0.0, 0.0, 0.0, 1.0),
-    #     (0.0, 10.0, 0.0, 10.0)
-    # ])
-    # def test_min_max_setting(self, original_min: float, original_max: float, expected_min: float, expected_max: float):
-    #     random_args = FloatRandomArgsSource(original_min, original_max)
-    #     self.assertEqual(expected_min, random_args._min_border)
-    #     self.assertEqual(expected_max, random_args._max_border)
-    #
-    # @parameterized.expand([
-    #     (-1, 1),
-    #     (0, 1),
-    #     (1, 1),
-    #     (2, 2)
-    # ])
-    # def test_quantity_setting(self, original_quantity: int, expected_quantity: int):
-    #     random_args = FloatRandomArgsSource(0.0, 1.0, original_quantity)
-    #     self.assertEqual(expected_quantity, random_args._quantity)
-    #
-    # @parameterized.expand([
-    #     (0.0, 10.0, 1),
-    #     (-3.0, 0.0, 5),
-    #     (-10.0, 10.0, 10)
-    # ])
-    # def test_creation(self, min_border: float, max_border: float, quantity: int):
-    #     random_args = FloatRandomArgsSource(min_border, max_border, quantity)
-    #     result = random_args()
-    #     self.assertEqual(quantity, len(result))
-    #     for arg in result:
-    #         self.assertEqual(True, arg >= min_border)
-    #         self.assertEqual(True, arg <= max_border)
+    @parameterized.expand([
+        ([], Args.DEFAULT_QUANTITY),
+        ([-1], Args.DEFAULT_QUANTITY),
+        ([0], Args.DEFAULT_QUANTITY),
+        ([1], 1),
+        ([10], 10),
+        ([10.0], Args.DEFAULT_QUANTITY),
+        ([''], Args.DEFAULT_QUANTITY)
+    ])
+    def test_quantity_checking(self, input_, expected: int):
+        args = Args(None, None)
+        result = args._check_and_get_quantity(*input_)
+        self.assertEqual(expected, result)
+
+    def test_calling_when_types_mismatching(self):
+        class TestRange:
+            @property
+            def type(self):
+                return 'type0'
+
+        class TestGenerator:
+            @property
+            def type(self):
+                return 'type1'
+
+        args = Args(TestRange(), TestGenerator())
+        with self.assertRaises(Exception) as context:
+            _ = args()
+        self.assertTrue(args.TYPES_MISMATCH_EXCEPTION_MSG in context.exception.args)
+
+    def test_calling(self):
+        expected_result = (0.0, 1.0, 2.0)
+        expected_quantity = 3
+
+        class TestRange:
+            @property
+            def type(self):
+                return 'type'
+
+        class TestGenerator:
+            @property
+            def type(self):
+                return 'type'
+
+            def __call__(self, *args, **kwargs):
+                self._range = args[0]
+                self._quantity = args[1]
+                return expected_result
+
+        test_range = TestRange()
+        test_generator = TestGenerator()
+        args_ = Args(test_range, test_generator)
+        result = args_(expected_quantity)
+
+        self.assertEqual(expected_result, result)
+        self.assertEqual(expected_quantity, test_generator._quantity)
+        self.assertEqual(test_range, test_generator._range)
 
 
 if __name__ == '__main__':
