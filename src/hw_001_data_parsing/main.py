@@ -103,9 +103,9 @@ def print_most_frequent(task):
 def run():
     conf = Configurator()
 
-    feed_pages = get_saved_feed_pages(conf) if conf('source.take-from-dump.feed-page') else get_feed_pages(conf)
-    article_pages = get_saved_article_pages(conf) if conf('source.take-from-dump.article-page') else get_article_pages(conf, feed_pages)
-    dataset = get_saved_dataset(conf) if conf('source.take-from-dump.dataset') else get_dataset(conf, article_pages)
+    feed_pages = get_saved_feed_pages(conf) if conf('source_.take-from-dump.feed-page') else get_feed_pages(conf)
+    article_pages = get_saved_article_pages(conf) if conf('source_.take-from-dump.article-page') else get_article_pages(conf, feed_pages)
+    dataset = get_saved_dataset(conf) if conf('source_.take-from-dump.dataset') else get_dataset(conf, article_pages)
 
     most_viewed_task = MostViewedArticlesTask(conf('task.most-viewed.top-quantity'))
     most_freq_words = MostFrequentWordsTask(conf('task.most-freq-words.top-quantity'), conf('task.most-freq-words.excluded'))

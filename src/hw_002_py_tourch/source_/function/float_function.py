@@ -1,6 +1,7 @@
 import math
 
 
+# todo del
 class FloatFunction:
     ARGS_QUANTITY = 2
     EXCEPTION_MESSAGE_NO_ONE_ARG = 'No one args-generator'

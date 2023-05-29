@@ -1,4 +1,5 @@
 
+# todo del
 class Args:
     DEFAULT_QUANTITY = 1
     TYPES_MISMATCH_EXCEPTION_MSG = 'Mismatching of types'

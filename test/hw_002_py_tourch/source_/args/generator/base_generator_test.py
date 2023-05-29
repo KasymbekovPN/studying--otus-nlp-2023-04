@@ -1,8 +1,9 @@
 import unittest
 
 from parameterized import parameterized
-from src.hw_002_py_tourch.source.args.generator.base_generator import BaseGenerator
+from src.hw_002_py_tourch.source_.args.generator.base_generator import BaseGenerator
 
+# todo del
 
 class TestCase(unittest.TestCase):
     @parameterized.expand([

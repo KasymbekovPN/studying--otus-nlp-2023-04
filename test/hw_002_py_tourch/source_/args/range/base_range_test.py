@@ -1,9 +1,10 @@
 import unittest
 
 from parameterized import parameterized
-from src.hw_002_py_tourch.source.args.range.base_range import BaseRange
+from src.hw_002_py_tourch.source_.args.range.base_range import BaseRange
 
 
+# todo del
 class TestCase(unittest.TestCase):
 
     @parameterized.expand([

@@ -1,5 +1,6 @@
 
-class BaseGenerator:
+# todo del
+class BaseRange:
     TYPE_SETTER_EXC_MSG = 'Type setter is unsupported'
 
     def __init__(self, type_):

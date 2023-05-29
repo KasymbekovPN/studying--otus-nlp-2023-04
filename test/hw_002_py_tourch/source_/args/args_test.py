@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from src.hw_002_py_tourch.source.args.args import Args
+from src.hw_002_py_tourch.source_.args.args import Args
 
 
 class TestCase(unittest.TestCase):

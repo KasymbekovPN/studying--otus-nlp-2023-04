@@ -24,7 +24,7 @@ def predict(net, x, y):
 
 
 class Net(torch.nn.Module):
-    N0 = 100
+    N0 = 1000
     N1 = 350
     N2 = 300
     N3 = 100
@@ -76,7 +76,8 @@ class SineNet(torch.nn.Module):
 def demo0():
     matplotlib.rcParams['figure.figsize'] = (13.0, 5.0)
 
-    x_train = torch.rand(100)
+    # x_train = torch.rand(100)
+    x_train = torch.rand(1000)
     x_train = x_train * 20 - 10
 
     y_train = torch.sin(x_train)
@@ -92,7 +93,8 @@ def demo0():
     # plt.title('Gaussian noise');
     # plt.show()
 
-    y_train = y_train + noise
+    # y_train = y_train + noise
+
     # plt.plot(x_train.numpy(), y_train.numpy(), 'o')
     # plt.title('noisy sin(x)')
     # plt.xlabel('x_train')
@@ -119,7 +121,7 @@ def demo0():
     sine_net = Net()
     # predict(sine_net, x_validation, y_validation)
 
-    optimizer = torch.optim.Adam(sine_net.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(sine_net.parameters(), lr=0.001)
 
     sine_net.train()
     for epoch in range(2000):
@@ -147,6 +149,19 @@ def demo0():
 #
 # predict(sine_net, x_validation, y_validation)
 
+def demo1():
+    x = torch.rand(10)
+    y = torch.rand(x.shape)
+    print(x)
+    print(y)
+
+    z = x + y
+    print(z)
+
+    a = torch.FloatTensor(2, 10)
+    print('a:', a)
+    for i in x:
+        print('i: ', i)
 
 
 
@@ -201,4 +216,5 @@ if __name__ == '__main__':
     # ft8.cpu()
     # torch.cuda.empty_cache()
 
-    demo0()
+    # demo0()
+    demo1()

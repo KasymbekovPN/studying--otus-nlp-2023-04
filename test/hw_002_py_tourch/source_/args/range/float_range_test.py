@@ -2,9 +2,10 @@ import random
 import unittest
 
 from parameterized import parameterized
-from src.hw_002_py_tourch.source.args.range.float_range import FloatRange
+from src.hw_002_py_tourch.source_.args.range.float_range import FloatRange
 
 
+# todo del
 class TestCase(unittest.TestCase):
 
     @parameterized.expand([

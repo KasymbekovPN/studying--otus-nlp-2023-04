@@ -1,6 +1,7 @@
-from src.hw_002_py_tourch.source.args.range.base_range import BaseRange
+from src.hw_002_py_tourch.source_.args.range.base_range import BaseRange
 
 
+# todo del
 class FloatRange(BaseRange):
     DELTA = 0.001
     MIN_SETTER_EXC_MSG = 'Min setter is unsupported'

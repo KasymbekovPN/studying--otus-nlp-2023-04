@@ -3,9 +3,10 @@ import unittest
 import math
 
 from src.common.test import repeat
-from src.hw_002_py_tourch.source.function.float_function import FloatFunction
+from src.hw_002_py_tourch.source_.function.float_function import FloatFunction
 
 
+# todo del
 class TestCase(unittest.TestCase):
 
     def test_calculation_without_args(self):
