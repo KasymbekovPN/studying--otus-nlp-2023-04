@@ -19,7 +19,29 @@ class TestCase(unittest.TestCase):
         ds = ComplexLinearDS()
         self.assertEqual(expected, ds._adjust_or_get_len(self.TEST_KEY, **kwargs))
 
-    # todo  _adjust_range -- check it
+    def test_tensor_creation(self):
+        expected_len = 10
+        ds = ComplexLinearDS()
+        tensor = ds._create_tensor(expected_len)
+
+        self.assertEqual(expected_len, len(tensor))
+        for item in tensor:
+            print(item, ' ', type(item))
+            self.assertTrue(-10.0 <= item <= 10.0)
+
+    def test_calling(self):
+        train_len = 10
+        test_len = 11
+        val_len = 12
+        kwargs = {
+            'train_len': train_len,
+            'test_len': test_len,
+            'val_len': val_len
+        }
+        ds = ComplexLinearDS()
+        result = ds(**kwargs)
+
+        self.assertEqual(3, len(result))
 
 
 if __name__ == '__main__':

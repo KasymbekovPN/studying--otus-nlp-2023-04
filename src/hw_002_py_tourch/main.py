@@ -80,6 +80,7 @@ def demo0():
     x_train = torch.rand(1000)
     x_train = x_train * 20 - 10
 
+
     y_train = torch.sin(x_train)
 
     # plt.plot(x_train.numpy(), y_train.numpy(), 'o')
