@@ -154,15 +154,33 @@ def demo1():
     x = torch.rand(10)
     y = torch.rand(x.shape)
     print(x)
-    print(y)
+    print(y.numpy())
+    #
+    # z = x + y
+    # print(z)
+    #
+    # a = torch.FloatTensor(2, 10)
+    # print('a:', a)
+    # for i in x:
+    #     print('i: ', i)
 
-    z = x + y
-    print(z)
+    x.unsqueeze_(1)
+    print(x)
+    x.squeeze_(1)
+    print(x)
 
-    a = torch.FloatTensor(2, 10)
-    print('a:', a)
-    for i in x:
-        print('i: ', i)
+    A_idx = torch.LongTensor([0]) # the index vector
+    B = torch.LongTensor([[1, 2, 3], [4, 5, 6]])
+    # B.squeeze_(1)
+    C = B.index_select(1, A_idx)
+    print(A_idx)
+    print(B)
+    print(C)
+    C1 = C.detach().clone()
+    C1.squeeze_(1)
+    print(C)
+    print(C1)
+
 
 
 
