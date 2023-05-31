@@ -7,7 +7,7 @@ class ComplexLinearDS:
     MIN_LEN = 1
     MAX_LEN = 1_000_000
     DEFAULT_LEN = 10_000
-    KEYS = ('train_len', 'test_len', 'val_len')
+    KEYS = ('train', 'test', 'val')
 
     def __init__(self, range_=FloatRange(-10.0, 10.0)):
         self._range = range_

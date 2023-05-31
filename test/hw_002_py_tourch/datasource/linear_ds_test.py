@@ -34,9 +34,9 @@ class TestCase(unittest.TestCase):
         test_len = 11
         val_len = 12
         kwargs = {
-            'train_len': train_len,
-            'test_len': test_len,
-            'val_len': val_len
+            'train': train_len,
+            'test': test_len,
+            'val': val_len
         }
         ds = ComplexLinearDS()
         result = ds(**kwargs)
