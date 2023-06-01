@@ -1,23 +1,23 @@
-import torch
+import math
+import random
 import unittest
 
+from src.common.test import repeat
 from src.hw_002_py_tourch.function.functions import sin_exp_function
 
 
 class TestCase(unittest.TestCase):
 
+    @repeat(1_000)
     def test_sin_exp_function(self):
-        args = torch.FloatTensor([
-            [1.0, 2.0],
-            [1.1, 2.1],
-            [1.2, 2.2]
-        ])
-        x = torch.FloatTensor([1.0, 1.1, 1.2])
-        y = torch.FloatTensor([2.0, 2.1, 2.2])
-        expected = torch.sin(x + 2*y) * torch.exp(-1 * ((2*x + y) ** 2))
+        def test_func(x_, y_):
+            return math.sin(x_ + 2 * y_) * math.exp(-1 * ((2 * x_ + y_) ** 2))
 
-        result = sin_exp_function(args)
-        self.assertEqual(expected.numpy().all(), result.numpy().all())
+        x = random.uniform(-10.0, 10.0)
+        y = random.uniform(-10.0, 10.0)
+        expected = test_func(x, y)
+
+        self.assertEqual(expected, sin_exp_function(x, y))
 
 
 if __name__ == '__main__':

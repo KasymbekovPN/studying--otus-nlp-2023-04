@@ -20,7 +20,7 @@ def predict(net, x, y):
     y_prediction = net.forward(x)
 
     plt.plot(x.numpy(), y.numpy(), 'o', label='Groud truth')
-    plt.plot(x.numpy(), y_prediction.data.numpy(), 'o', c='r', label='Prediction');
+    plt.plot(x.numpy(), y_prediction.data.numpy(), 'o', c='r', label='Prediction')
     plt.legend(loc='upper left')
     plt.xlabel('$x$')
     plt.ylabel('$y$')
@@ -325,8 +325,20 @@ if __name__ == '__main__':
     # demo2()
     # demo3()
 
+    a = np.array([3, 5, 1, -1, 10, -100])
+    print(a)
+    b = np.sort(a)
+    print(a)
+    print(b)
+
     pass
     # t = torch.FloatTensor(2, 2)
     # print(t)
     # t[1, 1] = 123.9
     # print(t)
+
+    # print(14000 ** 0.5)
+    # print(120 ** 2)
+
+    # x = np.random.uniform(-10.0, 10.0, [1, 10])
+    # print(x)
