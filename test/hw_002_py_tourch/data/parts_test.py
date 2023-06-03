@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from src.hw_002_py_tourch.datasource.parts import Parts
+from src.hw_002_py_tourch.data.parts import Parts
 
 
 # todo del

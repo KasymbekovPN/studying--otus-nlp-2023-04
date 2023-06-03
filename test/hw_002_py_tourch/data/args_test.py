@@ -1,6 +1,6 @@
 import unittest
 
-from src.hw_002_py_tourch.datasource.args import create_float_args
+from src.hw_002_py_tourch.data.args import create_float_args
 
 
 class TestCase(unittest.TestCase):

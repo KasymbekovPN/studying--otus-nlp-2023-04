@@ -1,7 +1,7 @@
 import unittest
 
 from parameterized import parameterized
-from src.hw_002_py_tourch.datasource.linear_ds import ComplexLinearDS
+from src.hw_002_py_tourch.data.linear_ds import ComplexLinearDS
 
 
 class TestCase(unittest.TestCase):

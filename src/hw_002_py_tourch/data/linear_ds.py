@@ -1,6 +1,6 @@
 import torch
 
-from src.hw_002_py_tourch.datasource.float_range import FloatRange
+from src.hw_002_py_tourch.data.float_range import FloatRange
 
 
 class ComplexLinearDS:

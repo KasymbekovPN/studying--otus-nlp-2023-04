@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-from src.hw_002_py_tourch.datasource.linear_ds import ComplexLinearDS
-from src.hw_002_py_tourch.datasource.args import create_float_args
+from src.hw_002_py_tourch.data.linear_ds import ComplexLinearDS
+from src.hw_002_py_tourch.data.args import create_float_args
+from src.hw_002_py_tourch.function.functions import sin_exp_function
 
 
 def create_figure_old(x: 'ndarray', y: 'ndarray', zz: list, title: str) -> 'plt':
@@ -67,16 +68,11 @@ def create_figure_old(x: 'ndarray', y: 'ndarray', zz: list, title: str) -> 'plt'
     return plt
 
 
-# todo move
-def sin_exp_func(x, y):
-    return math.sin(x + 2 * y) * math.exp(-1 * ((2 * x + y) ** 2))
-
-
 # todo ndarray
 def create_figure(x: 'ndarray', y: 'ndarray', z: 'ndarray', title: str) -> 'plt':
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(x_mesh, y_mesh, z_mesh)
+    ax.plot_surface(x, y, z)
 
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
@@ -88,35 +84,24 @@ def create_figure(x: 'ndarray', y: 'ndarray', z: 'ndarray', title: str) -> 'plt'
     return plt
 
 
+def train(length: int):
+    x_original = create_float_args(length)
+    y_original = create_float_args(length)
+
+    x_mesh, y_mesh = np.meshgrid(x_original, y_original)
+    x_ravel = np.ravel(x_mesh)
+    y_ravel = np.ravel(y_mesh)
+    z_ravel = np.array([sin_exp_function(x, y) for x, y in zip(x_ravel, y_ravel)])
+    z_mesh = z_ravel.reshape(x_mesh.shape)
+    create_figure(x_mesh, y_mesh, z_mesh, 'Original').show()
+
+
 if __name__ == '__main__':
     train_len = 140
     test_len = 30
     val_len = 30
 
-    x_original = create_float_args(train_len)
-    y_original = create_float_args(train_len)
-
-    x_mesh, y_mesh = np.meshgrid(x_original, y_original)
-    x_ravel = np.ravel(x_mesh)
-    y_ravel = np.ravel(y_mesh)
-    z_ravel = np.array([sin_exp_func(x, y) for x, y in zip(x_ravel, y_ravel)])
-    z_mesh = z_ravel.reshape(x_mesh.shape)
-    create_figure(x_mesh, y_mesh, z_mesh, 'Train').show()
-
-
-    # ds_result = ComplexLinearDS()(train=train_len, test=test_len, val=val_len)
-    # train_args = ds_result.get('train')
-    # test_args = ds_result.get('test')
-    # val_args = ds_result.get('val')
-    # print(len(train_args))
-    # print(len(test_args))
-    # print(len(val_args))
-
-    # train_func_result = sin_exp_function(train_args)
-    # print(len(func_result))
-    # print(func_result)
-
-    # create_figure(train_args, [train_func_result], 'some title').show()
+    train(train_len)
 
 
     pass

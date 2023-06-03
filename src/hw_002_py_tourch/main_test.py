@@ -325,11 +325,16 @@ if __name__ == '__main__':
     # demo2()
     # demo3()
 
-    a = np.array([3, 5, 1, -1, 10, -100])
-    print(a)
-    b = np.sort(a)
-    print(a)
-    print(b)
+    # a = np.array([3, 5, 1, -1, 10, -100])
+    # print(a)
+    # b = np.sort(a)
+    # print(a)
+    # print(b)
+
+    # height = np.array([3, 2, 4, 3, 3.5, 2, 5.5, 1])
+    # width = np.array([1.5, 1, 1.5, 1, .5, .5, 1, 1])
+    # results = np.vstack((height, width))
+    # print(results)
 
     pass
     # t = torch.FloatTensor(2, 2)

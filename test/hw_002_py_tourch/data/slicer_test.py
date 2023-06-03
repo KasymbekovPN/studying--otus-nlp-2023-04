@@ -1,7 +1,7 @@
 import torch
 import unittest
 
-from src.hw_002_py_tourch.datasource.slicer import slice_two_args_tensor
+from src.hw_002_py_tourch.data.slicer import slice_two_args_tensor
 
 
 class TestCase(unittest.TestCase):

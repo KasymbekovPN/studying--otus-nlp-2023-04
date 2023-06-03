@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.hw_002_py_tourch.datasource.float_range import FloatRange
+from src.hw_002_py_tourch.data.float_range import FloatRange
 
 
 def create_float_args(length: int, range_=FloatRange(-10.0, 10.0)) -> 'ndarray':
