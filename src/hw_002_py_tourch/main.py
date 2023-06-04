@@ -7,6 +7,7 @@ import math
 from src.hw_002_py_tourch.data.linear_ds import ComplexLinearDS
 from src.hw_002_py_tourch.data.args import create_float_args
 from src.hw_002_py_tourch.data.array_processor import group_line_float_tensors
+from src.hw_002_py_tourch.data.points import Points
 from src.hw_002_py_tourch.function.functions import sin_exp_function
 from src.hw_002_py_tourch.loss.functions import compute_mse_loss
 from src.hw_002_py_tourch.nn.neuro_net import Net
@@ -72,8 +73,7 @@ def create_figure_old(x: 'ndarray', y: 'ndarray', zz: list, title: str) -> 'plt'
     return plt
 
 
-# todo ndarray
-def create_figure(x: 'ndarray', y: 'ndarray', z: 'ndarray', title: str) -> 'plt':
+def create_figure(x, y, z, title: str) -> 'plt':
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(x, y, z)
@@ -82,44 +82,28 @@ def create_figure(x: 'ndarray', y: 'ndarray', z: 'ndarray', title: str) -> 'plt'
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
     plt.title(title)
-    # fake2Dline = matplotlib.lines.Line2D([0],[0], linestyle="none", c='b', marker='o')
-    # ax.legend([fake2Dline], ['Lyapunov function on XY plane'], numpoints = 1)
 
     return plt
 
 
-def train(length: int, neuron_net, cxt: dict):
-    x_original = create_float_args(length)
-    y_original = create_float_args(length)
-
-    x_mesh, y_mesh = np.meshgrid(x_original, y_original)
-    x_ravel = np.ravel(x_mesh)
-    y_ravel = np.ravel(y_mesh)
-    z_ravel = np.array([sin_exp_function(x, y) for x, y in zip(x_ravel, y_ravel)])
-    z_mesh = z_ravel.reshape(x_mesh.shape)
-    # todo ???
-    # create_figure(x_mesh, y_mesh, z_mesh, 'Original').show()
-
-    input_tensor = group_line_float_tensors(torch.from_numpy(x_ravel), torch.from_numpy(y_ravel))
-    output_tensor = torch.from_numpy(z_ravel).unsqueeze_(1)
-
+def train(neuron_net, points: 'Points'):
     optimizer = torch.optim.Adam(neuron_net.parameters(), lr=0.001) # todo move into config
     neuron_net.train()
-    for epoch in range(1_000): # move into ?
+    for epoch in range(2_000): # move into ?
         if epoch % 10 == 0:
             print(f'epoch: {epoch}')
         optimizer.zero_grad()
-        z_predication = neuron_net.forward(input_tensor)
-        loss_val = compute_mse_loss(z_predication, output_tensor)
+        z_predication = neuron_net.forward(points.torch_input)
+        loss_val = compute_mse_loss(z_predication, points.torch_output)
         loss_val.backward()
         optimizer.step()
     neuron_net.eval()
 
-    result_ravel = neuron_net.forward(input_tensor).squeeze(1).detach().numpy()
-    result_mesh = result_ravel.reshape(x_mesh.shape)
+    result_ravel = neuron_net.forward(points.torch_input).squeeze(1).detach().numpy()
+    result_mesh = result_ravel.reshape(points.mesh_x.shape)
 
-    create_figure(x_mesh, y_mesh, z_mesh, 'Original')
-    create_figure(x_mesh, y_mesh, result_mesh, 'Result').show()
+    create_figure(points.mesh_x, points.mesh_y, points.mesh_z, 'Original')
+    create_figure(points.mesh_x, points.mesh_y, result_mesh, 'Result').show()
 
 
 if __name__ == '__main__':
@@ -127,14 +111,12 @@ if __name__ == '__main__':
     test_len = 30 # todo move into config
     val_len = 30 # todo move into config
 
-    context = {}
+    # context = {}
     # net = Net([1_000, 1_000, 1_000, 1_000, 1_000]) # -
     # net = Net([200, 175, 150, 125, 100])
     # net = Net([100, 100, 100, 100, 100])
     # net = Net([50, 50, 50, 50, 50])
     net = Net([25, 25, 25, 25, 25])
 
-    train(train_len, net, context)
-
-
-    pass
+    train_points = Points(train_len, train_len)
+    train(net, train_points)
