@@ -6,7 +6,11 @@ import math
 
 from src.hw_002_py_tourch.data.linear_ds import ComplexLinearDS
 from src.hw_002_py_tourch.data.args import create_float_args
+from src.hw_002_py_tourch.data.array_processor import group_line_float_tensors
 from src.hw_002_py_tourch.function.functions import sin_exp_function
+from src.hw_002_py_tourch.loss.functions import compute_mse_loss
+from src.hw_002_py_tourch.nn.neuro_net import Net
+
 
 
 def create_figure_old(x: 'ndarray', y: 'ndarray', zz: list, title: str) -> 'plt':
@@ -84,7 +88,7 @@ def create_figure(x: 'ndarray', y: 'ndarray', z: 'ndarray', title: str) -> 'plt'
     return plt
 
 
-def train(length: int):
+def train(length: int, neuron_net, cxt: dict):
     x_original = create_float_args(length)
     y_original = create_float_args(length)
 
@@ -93,15 +97,44 @@ def train(length: int):
     y_ravel = np.ravel(y_mesh)
     z_ravel = np.array([sin_exp_function(x, y) for x, y in zip(x_ravel, y_ravel)])
     z_mesh = z_ravel.reshape(x_mesh.shape)
-    create_figure(x_mesh, y_mesh, z_mesh, 'Original').show()
+    # todo ???
+    # create_figure(x_mesh, y_mesh, z_mesh, 'Original').show()
+
+    input_tensor = group_line_float_tensors(torch.from_numpy(x_ravel), torch.from_numpy(y_ravel))
+    output_tensor = torch.from_numpy(z_ravel).unsqueeze_(1)
+
+    optimizer = torch.optim.Adam(neuron_net.parameters(), lr=0.001) # todo move into config
+    neuron_net.train()
+    for epoch in range(1_000): # move into ?
+        if epoch % 10 == 0:
+            print(f'epoch: {epoch}')
+        optimizer.zero_grad()
+        z_predication = neuron_net.forward(input_tensor)
+        loss_val = compute_mse_loss(z_predication, output_tensor)
+        loss_val.backward()
+        optimizer.step()
+    neuron_net.eval()
+
+    result_ravel = neuron_net.forward(input_tensor).squeeze(1).detach().numpy()
+    result_mesh = result_ravel.reshape(x_mesh.shape)
+
+    create_figure(x_mesh, y_mesh, z_mesh, 'Original')
+    create_figure(x_mesh, y_mesh, result_mesh, 'Result').show()
 
 
 if __name__ == '__main__':
-    train_len = 140
-    test_len = 30
-    val_len = 30
+    train_len = 140 # todo move into config
+    test_len = 30 # todo move into config
+    val_len = 30 # todo move into config
 
-    train(train_len)
+    context = {}
+    # net = Net([1_000, 1_000, 1_000, 1_000, 1_000]) # -
+    # net = Net([200, 175, 150, 125, 100])
+    # net = Net([100, 100, 100, 100, 100])
+    # net = Net([50, 50, 50, 50, 50])
+    net = Net([25, 25, 25, 25, 25])
+
+    train(train_len, net, context)
 
 
     pass

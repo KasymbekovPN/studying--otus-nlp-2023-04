@@ -25,19 +25,17 @@ class Net(torch.nn.Module):
         if neuron_quantities is None or len(neuron_quantities) == 0:
             neuron_quantities = self.DEFAULT_NEURON_QUANTITIES
         in_features = self.NET_IN_FEATURES
-        self._layers = []
+        layers = []
         for q in neuron_quantities:
-            self._layers.append(layer_creator(in_features, q))
-            self._layers.append(activator_creator())
+            layers.append(layer_creator(in_features, q))
+            layers.append(activator_creator())
             in_features = q
-        self._layers.append(create_layer(in_features, self.NET_OUT_FEATURES))
+        self.output = create_layer(in_features, self.NET_OUT_FEATURES)
+        layers.append(self.output)
+        self.seq = torch.nn.Sequential(*layers)
 
-    # todo check x type
     def forward(self, x):
-        for layer in self._layers:
-            print(x)
-            x = layer(x)
-        return x
+        return self.seq(x)
 
     def _checkOrGetQuantity(self, original_value: int) -> int:
         return original_value \

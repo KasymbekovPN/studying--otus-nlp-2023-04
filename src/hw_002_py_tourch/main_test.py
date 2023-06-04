@@ -320,7 +320,7 @@ if __name__ == '__main__':
     # ft8.cpu()
     # torch.cuda.empty_cache()
 
-    # demo0()
+    demo0()
     # demo1()
     # demo2()
     # demo3()
