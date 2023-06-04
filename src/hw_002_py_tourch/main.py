@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
+from src.hw_002_py_tourch.configurator.configurator import Configurator
 from src.hw_002_py_tourch.data.linear_ds import ComplexLinearDS
 from src.hw_002_py_tourch.data.args import create_float_args
 from src.hw_002_py_tourch.data.array_processor import group_line_float_tensors
@@ -86,11 +87,12 @@ def create_figure(x, y, z, title: str) -> 'plt':
     return plt
 
 
-def train(neuron_net, points: 'Points'):
-    optimizer = torch.optim.Adam(neuron_net.parameters(), lr=0.001) # todo move into config
+def train(neuron_net, points: 'Points', configurator: 'Configurator'):
+    optimizer = torch.optim.Adam(neuron_net.parameters(), lr=configurator('learning-rate'))
     neuron_net.train()
-    for epoch in range(2_000): # move into ?
-        if epoch % 10 == 0:
+
+    for epoch in range(configurator('quantity.epochs')):
+        if epoch % configurator('step.epoch-log') == 0:
             print(f'epoch: {epoch}')
         optimizer.zero_grad()
         z_predication = neuron_net.forward(points.torch_input)
@@ -99,24 +101,15 @@ def train(neuron_net, points: 'Points'):
         optimizer.step()
     neuron_net.eval()
 
-    result_ravel = neuron_net.forward(points.torch_input).squeeze(1).detach().numpy()
-    result_mesh = result_ravel.reshape(points.mesh_x.shape)
-
-    create_figure(points.mesh_x, points.mesh_y, points.mesh_z, 'Original')
-    create_figure(points.mesh_x, points.mesh_y, result_mesh, 'Result').show()
-
 
 if __name__ == '__main__':
-    train_len = 140 # todo move into config
-    test_len = 30 # todo move into config
-    val_len = 30 # todo move into config
+    conf = Configurator()
+    net = Net(conf('quantity.neurons'))
+    train_points = Points(conf('size.train.x'), conf('size.train.y'))
+    train(net, train_points, conf)
 
-    # context = {}
-    # net = Net([1_000, 1_000, 1_000, 1_000, 1_000]) # -
-    # net = Net([200, 175, 150, 125, 100])
-    # net = Net([100, 100, 100, 100, 100])
-    # net = Net([50, 50, 50, 50, 50])
-    net = Net([25, 25, 25, 25, 25])
+    result_ravel = net.forward(train_points.torch_input).squeeze(1).detach().numpy()
+    result_mesh = result_ravel.reshape(train_points.mesh_x.shape)
 
-    train_points = Points(train_len, train_len)
-    train(net, train_points)
+    create_figure(train_points.mesh_x, train_points.mesh_y, train_points.mesh_z, 'Calculated')
+    create_figure(train_points.mesh_x, train_points.mesh_y, result_mesh, 'Approximated').show()
