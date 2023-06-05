@@ -11,6 +11,8 @@ class Configurator(BaseConfigurator):
             'size.train.x': 140,
             'size.train.y': 140,
             'size.test.x': 30,
-            'size.test.y': 30
+            'size.test.y': 30,
+            'size.val.x': 30,
+            'size.val.y': 30
         }
         super().__init__(params)

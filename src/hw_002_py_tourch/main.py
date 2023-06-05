@@ -26,31 +26,38 @@ def create_figures(x, y, z_data: list, title: str) -> 'plt':
     return plt
 
 
-def train(neuron_net, points: 'Points', configurator: 'Configurator'):
+def train(neuron_net, points: Points, configurator: 'Configurator'):
     optimizer = torch.optim.Adam(neuron_net.parameters(), lr=configurator('learning-rate'))
     neuron_net.train()
 
     epoch_quantity = configurator('quantity.epochs')
     for idx, epoch in enumerate(range(epoch_quantity)):
         if epoch % configurator('step.epoch-log') == 0:
-            print(f'[TRAIN] {idx * 100.0 / epoch_quantity}% {idx} / {epoch_quantity}')
+            print(f'\r[TRAIN] {idx * 100.0 / epoch_quantity}% {idx} / {epoch_quantity}', end='')
         optimizer.zero_grad()
         z_predication = neuron_net.forward(points.torch_input)
         loss_val = compute_mse_loss(z_predication, points.torch_output)
         loss_val.backward()
         optimizer.step()
     neuron_net.eval()
-    print(f'[TRAIN] Done')
+    print(f'\n[TRAIN] Done')
 
 
-def test():
-    pass
+def test(neuron_net, points: Points):
+    result_ravel = neuron_net.forward(points.torch_input).squeeze(1).detach().numpy()
+    mse = compute_mse_loss(result_ravel, points.ravel_z)
+    print(f'[TEST] MSE = {mse}')
 
 
-def display(x, y, z_calculated, z_approximated):
-    calculated_data = {'value': z_calculated, 'color': 'blue', 'text': 'Calculated'}
-    approximated_data = {'value': z_approximated, 'color': 'orangered', 'text': 'Approximated'}
+def display(neuron_net, points: Points):
+    result_ravel = neuron_net.forward(points.torch_input).squeeze(1).detach().numpy()
+    result_mesh = result_ravel.reshape(points.mesh_x.shape)
 
+    calculated_data = {'value': points.mesh_z, 'color': 'blue', 'text': 'Calculated'}
+    approximated_data = {'value': result_mesh, 'color': 'orangered', 'text': 'Approximated'}
+
+    x = points.mesh_x
+    y = points.mesh_y
     create_figures(x, y, [calculated_data], title='Calculated')
     create_figures(x, y, [approximated_data], title='Approximated')
     create_figures(x, y, [calculated_data, approximated_data], 'Comparison').show()
@@ -59,10 +66,12 @@ def display(x, y, z_calculated, z_approximated):
 if __name__ == '__main__':
     conf = Configurator()
     net = Net(conf('quantity.neurons'))
-    train_points = Points(conf('size.train.x'), conf('size.train.y'))
 
+    train_points = Points(conf('size.train.x'), conf('size.train.y'))
     train(net, train_points, conf)
 
-    result_ravel = net.forward(train_points.torch_input).squeeze(1).detach().numpy()
-    result_mesh = result_ravel.reshape(train_points.mesh_x.shape)
-    display(train_points.mesh_x, train_points.mesh_y, train_points.mesh_z, result_mesh)
+    test_points = Points(conf('size.test.x'), conf('size.test.y'))
+    test(net, test_points)
+
+    val_points = Points(conf('size.val.x'), conf('size.val.y'))
+    display(net, val_points)
