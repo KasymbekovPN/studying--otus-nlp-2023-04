@@ -1,6 +1,6 @@
 import unittest
 
-from src.hw_002_py_tourch.data.args import create_float_args
+from src.hw_002_py_tourch.data.args import create_random_float_args
 
 
 class TestCase(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestCase(unittest.TestCase):
             def max(self):
                 return max_
 
-        result = create_float_args(expected_length, TestRange())
+        result = create_random_float_args(expected_length, TestRange())
         self.assertEqual(expected_length, len(result))
         for item in result:
             self.assertTrue(min_ <= item <= max_)

@@ -7,7 +7,7 @@ class Configurator(BaseConfigurator):
             'learning-rate': 0.001,
             'step.epoch-log': 10,
             'quantity.epochs': 2_000,
-            'quantity.neurons': [25, 25, 25, 25, 25],
+            'quantity.neurons': [50, 50, 50, 50, 50],
             'size.train.x': 140,
             'size.train.y': 140,
             'size.test.x': 30,

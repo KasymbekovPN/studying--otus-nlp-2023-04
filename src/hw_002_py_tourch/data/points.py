@@ -3,13 +3,12 @@ import torch
 
 from src.hw_002_py_tourch.function.functions import sin_exp_function
 from src.hw_002_py_tourch.data.array_processor import group_line_float_tensors
-from src.hw_002_py_tourch.data.args import create_float_args
 
 
 class Points:
-    def __init__(self, x_size: int, y_size: int) -> None:
-        self._original_x = create_float_args(x_size)
-        self._original_y = create_float_args(y_size)
+    def __init__(self, original_x, original_y) -> None:
+        self._original_x = original_x
+        self._original_y = original_y
         self._mesh_x, self._mesh_y = numpy.meshgrid(self._original_x, self._original_y)
         self._ravel_x = numpy.ravel(self._mesh_x)
         self._ravel_y = numpy.ravel(self._mesh_y)
