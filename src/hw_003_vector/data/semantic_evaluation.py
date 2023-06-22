@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+# todo rename to Sentiment
 class SemanticEvaluation(Enum):
     UNKNOWN = 0
     POSITIVE = 1
