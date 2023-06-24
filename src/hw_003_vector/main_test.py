@@ -4,16 +4,34 @@ import pandas as pd
 import json
 import nltk
 import re
+import seaborn
+import warnings
+import random
 
 import pymorphy2
 from tqdm import tqdm
+from sklearn.manifold import TSNE
 from sklearn.metrics import *
-from collections import Counter
+from sklearn.metrics.pairwise import cosine_similarity
+from collections import Counter, defaultdict
+from nltk import FreqDist
 from nltk.stem.snowball import SnowballStemmer
+from sklearn.model_selection import train_test_split
+# from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.ensemble import RandomForestClassifier
+# from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import *
+from gensim.models import Word2Vec
+from bokeh.models import ColumnDataSource, LabelSet
+from bokeh.plotting import figure, show, output_file
+from bokeh.io import output_notebook
+from scipy.cluster.hierarchy import ward, dendrogram
+from pymystem3 import Mystem
 
-import warnings
 
 warnings.filterwarnings("ignore")
+random.seed(1228)
+pd.set_option('display.max_colwidth', None)
 
 
 def get_sentiment_set(data: list) -> set:
@@ -56,6 +74,22 @@ def process_data(data, stop_words):
         texts.append(tokens)
 
     return texts
+
+
+def label2num(label: str) -> int:
+    if label == 'positive':
+        return 1
+    elif label == 'negative':
+        return -1
+    return 0
+
+
+def num2label(y: str) -> str:
+    if y == 1:
+        return 'positive'
+    elif y == -1:
+        return 'negative'
+    return 'neutral'
 
 
 def demo0() -> None:
@@ -104,8 +138,231 @@ def demo0() -> None:
         norm = morph.parse(word)[0].normal_form
         print(f'original: {word}, norm: {norm}')
 
+    # text = 'в этот вечер мы слушаем вебинар по обработке естественного языка в отус'
+    # stemmed_text = ' '.join([morph.parse(x)[0].normal_form for x in text.split(' ')])
+    # print(f'Original text: {text}')
+    # print(f'Lemmatized text: {stemmed_text}')
+
+
+# bag of words
+def demo1():
+    with open('../../datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+
+    sentiments = [datum['sentiment'] for datum in data]
+    encoded_sentiments = [label2num(label) for label in sentiments]
+
+    path = '../../datasets/kazakh_news/text_lemmatized.txt'
+    texts = [line.replace('\n', '') for line in open(path, encoding='utf-8').readlines()]
+
+    idx = 1
+    print(f'sentiment: {sentiments[idx]}')
+    print(f'text: {texts[idx]}')
+
+    train_texts, test_texts, train_y, test_y = train_test_split(texts,
+                                                                encoded_sentiments,
+                                                                test_size=0.2,
+                                                                random_state=42,
+                                                                stratify=sentiments)
+
+    vectorizer = CountVectorizer(max_features=100)
+    vectorizer.fit(train_texts)
+
+    print(vectorizer.get_feature_names_out()[:10])
+
+    train_X = vectorizer.transform(train_texts)
+    test_X = vectorizer.transform(test_texts)
+    # print(train_X.todense()[:2])
+    # print(type(train_X))
+
+    # train_X = vectorizer.transform(train_texts)
+    # train_X.todense()[:2]
+
+    clf = RandomForestClassifier(n_estimators=500, max_depth=10)
+    clf = clf.fit(train_X, train_y)
+    pred = clf.predict(test_X)
+
+    print(f'pred: {pred[:20]}')
+    print(f'test_y: {test_y[:20]}')
+
+    decoded_pred = [num2label(y) for y in pred]
+    decoded_test_y = [num2label(y) for y in test_y]
+    print(f'Pred labels: {decoded_pred[:20]}')
+    print(f'Original labels: {decoded_test_y[:20]}')
+
+    print(f'Accuracy: {accuracy_score(test_y, pred)}')
+    print(f'F1: {f1_score(test_y, pred, average="macro")}')
+
+
+# tf-idf
+def demo2():
+    with open('../../datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+
+    sentiments = [datum['sentiment'] for datum in data]
+    encoded_sentiments = [label2num(label) for label in sentiments]
+
+    path = '../../datasets/kazakh_news/text_lemmatized.txt'
+    texts = [line.replace('\n', '') for line in open(path, encoding='utf-8').readlines()]
+
+    idx = 1
+    print(f'sentiment: {sentiments[idx]}')
+    print(f'text: {texts[idx]}')
+
+    train_texts, test_texts, train_y, test_y = train_test_split(texts,
+                                                                encoded_sentiments,
+                                                                test_size=0.2,
+                                                                random_state=42,
+                                                                stratify=sentiments)
+
+    vectorizer = TfidfVectorizer(max_features=200, norm=None)
+    vectorizer.fit(train_texts)
+    print(vectorizer.get_feature_names_out()[:20])
+
+    train_X = vectorizer.fit_transform(train_texts)
+    test_X = vectorizer.transform(test_texts)
+    # print(train_X.todense()[:2])
+
+    clf = RandomForestClassifier(n_estimators=500, max_features=10)
+    clf.fit(train_X, train_y)
+    pred = clf.predict(test_X)
+
+    decoded_pred = [num2label(y) for y in pred]
+    decoded_test_y = [num2label(y) for y in test_y]
+    print('Предсказанные метки: ', decoded_pred[0:20], ".....")
+    print('Истинные метки: ', decoded_test_y[0:20], ".....")
+
+    print(f'Accuracy: {accuracy_score(test_y, pred)}')
+    print(f'F1: {f1_score(test_y, pred, average="macro")}')
+
+
+# 10 vector representation
+def demo3():
+    m = Mystem()
+    regex = re.compile("[А-Яа-я:=!\)\()A-z\_\%/|]+")
+
+    def words_only(text, regex=regex):
+        try:
+            return ' '.join(regex.findall(text))
+        except:
+            return ''
+
+    def lemmatize(text, mystem=m):
+        try:
+            return ''.join(m.lemmatize(text)).strip()
+        except:
+            ' '
+
+    text0 = 'g;iuhoikl 7.kjh 87h одлжд :))'
+    print(words_only(text0))
+
+    df_pos = pd.read_csv('../../datasets/twitter/positive.csv', sep=';', header=None, usecols=[3])
+    print('\nPositive tail')
+    print(df_pos.tail(3))
+
+    df_neg = pd.read_csv('../../datasets/twitter/negative.csv', sep=';', header=None, usecols=[3])
+    print('\nNegative head')
+    print(df_neg.head(3))
+
+    # df_neg = pd.read_csv("negative.csv", sep=';', header=None, usecols=[3])
+    # df_pos = pd.read_csv("positive.csv", sep=';', header=None, usecols=[3])
+
+    df_neg['sent'] = 'neg'
+    df_pos['sent'] = 'pos'
+    df_neg['text'] = df_neg[3]
+    df_pos['text'] = df_pos[3]
+
+    df = pd.concat([df_neg, df_pos])
+    df = df[['text', 'sent']]
+
+    df.text = df.text.apply(words_only)
+
+    df = pd.read_csv('../../datasets/twitter/processed_text.csv', index_col=0)
+    print('\nProcessed text')
+    print(df.head())
+    print(f'df.shape: {df.shape}')
+
+    texts = [df.text.iloc[i].split() for i in range(len(df))]
+
+    model = Word2Vec(texts, window=5, min_count=5, workers=4)
+    model.save('../../datasets/twitter/word2v.model')
+
+
+# 10 vector representation
+def demo4():
+    model = Word2Vec.load('../../datasets/twitter/word2v.model')
+
+    print('model.wv.most_similar("школа")')
+    print(model.wv.most_similar("школа"))
+
+    print('model.wv.most_similar("school")')
+    print(model.wv.most_similar("school"))
+
+    print('model.wv.most_similar("работа")')
+    print(model.wv.most_similar("работа"))
+
+    print("vec = (model.wv['университет'] - model.wv['студент'] + model.wv['школьник']) / 3")
+    vec = (model.wv['университет'] - model.wv['студент'] + model.wv['школьник']) / 3
+    print(model.wv.similar_by_vector(vec))
+
+    print('model.wv.doesnt_match("ночь улица фонарь аптека".split())')
+    print(model.wv.doesnt_match("ночь улица фонарь аптека".split()))
+
+    df = pd.read_csv('../../datasets/twitter/processed_text.csv', index_col=0)
+    print('\nProcessed text')
+    print(df.head())
+    print(f'df.shape: {df.shape}')
+
+    texts = [df.text.iloc[i].split() for i in range(len(df))]
+
+    top_words = []
+    fd = FreqDist()
+    for text in texts:
+        fd.update(text)
+    for i in fd.most_common(500):
+        top_words.append(i[0])
+    print(top_words)
+
+    top_words_vec = model.wv[top_words]
+    print(f'top_words_vec.shape {top_words_vec.shape}')
+    # print(f'top_words_vec[0]: {top_words_vec[0]}')
+
+    tsne = TSNE(n_components=2, random_state=0)
+    top_words_tsne = tsne.fit_transform(top_words_vec)
+
+    # output_notebook()
+    output_file('../../output/bakeh.html')
+    p = figure(tools='pan,wheel_zoom,reset,save',
+               toolbar_location="above",
+               title='word2vec T-SNE for most common words')
+    source = ColumnDataSource(data=dict(x1=top_words_tsne[:, 0],
+                                        x2=top_words_tsne[:, 1],
+                                        names=top_words))
+    p.scatter(x='x1', y='x2', size=8, source=source)
+    labels = LabelSet(x='x1', y='x2', text='names', y_offset=6, text_font_size='8pt',
+                      text_color='#555555', source=source, text_align='center')
+    p.add_layout(labels)
+    # show(p)
+
+    dist = 1 - cosine_similarity(top_words_vec)
+    linkage_matrix = ward(dist)
+
+    fig, ax = plt.subplots(figsize=(10, 100))
+    ax = dendrogram(linkage_matrix, orientation='right', labels=top_words)
+    plt.tick_params(axis='x',
+                    which='both',
+                    bottom='off',
+                    top='off',
+                    labelbottom='off')
+    plt.tight_layout()
+    plt.savefig('../../output/image.png', dpi=200)
+
     pass
 
 
 if __name__ == '__main__':
-    demo0()
+    # demo0()
+    # demo1()
+    # demo2()
+    # demo3()
+    demo4()
