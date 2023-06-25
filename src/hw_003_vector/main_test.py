@@ -1,6 +1,9 @@
+import datetime
+
 import matplotlib.pylab as plt
 import numpy as np
 import pandas as pd
+import json
 import json
 import nltk
 import re
@@ -11,6 +14,7 @@ import random
 import pymorphy2
 from tqdm import tqdm
 from sklearn.manifold import TSNE
+from sklearn.pipeline import *
 from sklearn.metrics import *
 from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter, defaultdict
@@ -21,17 +25,24 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 # from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import *
+from sklearn.decomposition import TruncatedSVD, PCA
+from sklearn.preprocessing import Normalizer, LabelEncoder
 from gensim.models import Word2Vec
+from gensim.models import *
+from gensim import corpora
+from gensim import similarities
+
 from bokeh.models import ColumnDataSource, LabelSet
 from bokeh.plotting import figure, show, output_file
 from bokeh.io import output_notebook
 from scipy.cluster.hierarchy import ward, dendrogram
 from pymystem3 import Mystem
-
+from matplotlib import style
 
 warnings.filterwarnings("ignore")
 random.seed(1228)
 pd.set_option('display.max_colwidth', None)
+style.use('ggplot')
 
 
 def get_sentiment_set(data: list) -> set:
@@ -360,9 +371,80 @@ def demo4():
     pass
 
 
+# 13 topic modeling
+def demo5():
+    stop_words = load_stop_words()
+
+    # df = pd.read_csv('../../datasets/twitter/processed_text.csv', index_col=0)
+    # texts = [row['text'] for idx, row in df.iterrows()]
+    # content = ''
+    # delimiter = ''
+    # for i in range(25_000):
+    #     content += delimiter + texts[i]
+    #     delimiter = '\n\n'
+    # with open('../../output/topic_text.txt', 'w', encoding='utf-8') as f:
+    #     f.write(content)
+
+    with open('../../output/topic_text.txt', 'r', encoding='utf-8') as f:
+        texts = f.read().split('\n\n')
+
+    print(len(texts))
+    print(texts[0])
+
+    punctuation_re = r'[!"#$%&()*+,./:;<=>?@[\]^_`{|}~„“«»†*/\—–‘’]'
+    numbers_re = r'[0-9]'
+
+    texts = [re.sub('\n', ' ', text) for text in texts]
+    texts = [re.sub(punctuation_re, '', text) for text in texts]
+    texts = [re.sub(numbers_re, '', text) for text in texts]
+
+    tokenized_texts = []
+    for text in texts:
+        text = [w for w in text.split() if w not in stop_words]
+        tokenized_texts.append(text)
+
+    print(len(tokenized_texts))
+
+    print('Making dictionary...')
+    dictionary = corpora.Dictionary(tokenized_texts)
+    print(f'Original: {dictionary}')
+
+    dictionary.filter_extremes(no_below=5, no_above=0.9, keep_n=None)
+    dictionary.save('../../output/some.dict')
+    print(f'Filtered: {dictionary}')
+
+    print('Vectorizing corpus...')
+    corpus = [dictionary.doc2bow(text) for text in tokenized_texts]
+    corpora.MmCorpus.serialize('../../output/some.model', corpus)
+
+    print(len(tokenized_texts), len(corpus))
+
+    tfidf = TfidfModel(corpus)
+    corpus_tfidf = tfidf[corpus]
+
+    sampling_tfidf = random.choices(corpus_tfidf, k=30)
+    print(f'sampling_tfidf: {sampling_tfidf}')
+
+    index = similarities.MatrixSimilarity(sampling_tfidf)
+    print(f'index: {index}')
+
+    sims = index[sampling_tfidf]
+    # print(f'sims: {sims}')
+
+    plt.figure(figsize=(12, 10))
+    seaborn.heatmap(data=sims, cmap='Spectral').set(xticklabels=[], yticklabels=[])
+    plt.title('Sim matrix')
+    plt.show()
+
+    pass
+
+
+
+
 if __name__ == '__main__':
     # demo0()
     # demo1()
     # demo2()
     # demo3()
-    demo4()
+    # demo4()
+    demo5()
