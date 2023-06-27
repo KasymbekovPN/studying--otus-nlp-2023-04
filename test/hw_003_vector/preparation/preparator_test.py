@@ -5,8 +5,8 @@ from src.hw_003_vector.preparation.preparator import Preparator
 
 class TestCase(unittest.TestCase):
     def test_something(self):
-        def test_filter(text: str):
-            return text + 'b'
+        def test_filter(t: str):
+            return t + 'b'
 
         class NotCallableClass:
             pass
