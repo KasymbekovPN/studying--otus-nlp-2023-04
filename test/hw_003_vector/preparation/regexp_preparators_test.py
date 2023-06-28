@@ -2,9 +2,10 @@ import unittest
 import re
 
 from parameterized import parameterized
-from src.hw_003_vector.preparation.text_filters import RegFilter, TagsFilter, PunctuationFilter, NormSpaceFilter
+from src.hw_003_vector.preparation.regexp_preparators import RegexPreparator, HtmlTagsPreparator, PunctuationPreparator, SpacePreparator
 
 
+# todo del
 class TestCase(unittest.TestCase):
 
     @parameterized.expand([
@@ -13,8 +14,8 @@ class TestCase(unittest.TestCase):
         ['abc', 'bbc']
     ])
     def test_reg_filter(self, original_text: str, expected_text: str):
-        f = RegFilter(re.compile(r'a'), 'b')
-        result_text = f.filter(original_text)
+        f = RegexPreparator(re.compile(r'a'), 'b')
+        result_text = f(text=original_text)
         self.assertEqual(expected_text, result_text)
 
     @parameterized.expand([
@@ -25,8 +26,8 @@ class TestCase(unittest.TestCase):
         ['<br /><br />The first thing', '  The first thing']
     ])
     def test_tags_filter(self, original_text: str, expected_text):
-        f = TagsFilter()
-        result_text = f.filter(original_text)
+        f = HtmlTagsPreparator()
+        result_text = f(text=original_text)
         self.assertEqual(expected_text, result_text)
 
     @parameterized.expand([
@@ -35,8 +36,8 @@ class TestCase(unittest.TestCase):
         ['a_*.,!?()_*b', 'a b']
     ])
     def test_punctuation_filter(self, original_text: str, expected_text: str):
-        f = PunctuationFilter()
-        result_text = f.filter(original_text)
+        f = PunctuationPreparator()
+        result_text = f(text=original_text)
         self.assertEqual(expected_text, result_text)
 
     @parameterized.expand([
@@ -45,8 +46,8 @@ class TestCase(unittest.TestCase):
         ['before \f\n\r\t\v after', 'before after']
     ])
     def test_space_normalization(self, original_text: str, expected_text: str):
-        f = NormSpaceFilter()
-        result_text = f.filter(original_text)
+        f = SpacePreparator()
+        result_text = f(text=original_text)
         self.assertEqual(expected_text, result_text)
 
 

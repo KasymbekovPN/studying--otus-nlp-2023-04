@@ -1,5 +1,5 @@
 
-class Preparator:
+class Preparation:
     def __init__(self, *filters) -> None:
         self._filters = [f for f in filters if callable(f)]
 

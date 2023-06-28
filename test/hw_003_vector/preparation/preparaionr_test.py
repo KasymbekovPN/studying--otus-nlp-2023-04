@@ -1,6 +1,6 @@
 import unittest
 
-from src.hw_003_vector.preparation.preparator import Preparator
+from src.hw_003_vector.preparation.preparation import Preparation
 
 
 class TestCase(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestCase(unittest.TestCase):
         text = 'a'
         expected_text = 'abc'
 
-        preparator = Preparator(test_filter, NotCallableClass(), CallableClass())
+        preparator = Preparation(test_filter, NotCallableClass(), CallableClass())
         result_text = preparator(text)
 
         self.assertEqual(expected_text, result_text)
