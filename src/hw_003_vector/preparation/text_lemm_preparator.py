@@ -6,10 +6,14 @@ from nltk.stem import WordNetLemmatizer
 class TextLemmPreparator:
     DOWNLOAD_TASKS = ['punkt', 'wordnet']
 
-    def __init__(self):
+    def __init__(self, text_key='review'):
+        self._text_key = text_key;
         [nltk.download(task) for task in self.DOWNLOAD_TASKS]
 
     def __call__(self, *args, **kwargs):
-        tokens = nltk.word_tokenize(kwargs.get('text'))
+        datum = kwargs.get('datum')
+        tokens = nltk.word_tokenize(datum[self._text_key])
         wnl = WordNetLemmatizer()
-        return ' '.join([wnl.lemmatize(word, 'v') for word in tokens])
+        datum[self._text_key] = ' '.join([wnl.lemmatize(word, 'v') for word in tokens])
+
+        return datum

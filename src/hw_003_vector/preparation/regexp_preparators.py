@@ -3,12 +3,16 @@ from typing import Pattern, AnyStr
 
 
 class RegexPreparator:
-    def __init__(self, pattern: Pattern[AnyStr], new_sub=' '):
+    def __init__(self, pattern: Pattern[AnyStr], new_sub=' ', text_key='review'):
         self._pattern = pattern
-        self._num_sub = new_sub
+        self._new_sub = new_sub
+        self._text_key = text_key
 
     def __call__(self, *args, **kwargs):
-        return self._pattern.sub(self._num_sub, kwargs.get('text'))
+        datum = kwargs.get('datum')
+        datum[self._text_key] = self._pattern.sub(self._new_sub, datum[self._text_key])
+
+        return datum
 
 
 class HtmlTagsPreparator(RegexPreparator):

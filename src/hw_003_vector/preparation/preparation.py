@@ -5,8 +5,8 @@ class Preparation:
 
     def __call__(self, *args, **kwargs) -> str | None:
         if len(args) > 0 and isinstance(args[0], str):
-            text = args[0]
+            datum = args[0]
             for f in self._filters:
-                text = f(text)
-            return text
+                datum = f(datum=datum)
+            return datum
         return None
