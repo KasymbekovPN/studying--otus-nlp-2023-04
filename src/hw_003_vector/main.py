@@ -1,56 +1,62 @@
 import copy
-import datetime
-import pathlib
+import csv
 
 from src.hw_003_vector.configurator.configurator import Configurator
 from src.hw_003_vector.reader.dataset_reader import DatasetReader
+from src.hw_003_vector.preparation.preparation import Preparation
+from src.hw_003_vector.preparation.case_preparator import CasePreparator
+from src.hw_003_vector.preparation.regexp_preparators import PunctuationPreparator, SpacePreparator, HtmlTagsPreparator
+from src.hw_003_vector.preparation.text_lemm_preparator import TextLemmPreparator
+from src.hw_003_vector.preparation.sentiment_read_preparator import SentimentReadPreparator
+from src.hw_003_vector.preparation.sentiment_write_preparator import SentimentWritePreparator
 
 
-def get_dataset(conf: Configurator) -> list[dict]:
+def write_prepared_dataset(dataset: list, conf: Configurator):
+    with open(conf('path.dataset.prepared'), 'w', newline='', encoding='utf-8') as file:
+        fieldnames = ['review', 'sentiment']
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        [writer.writerow(datum) for datum in dataset]
+
+
+def get_dataset(conf: Configurator) -> list[dict] | None:
     dataset_reader = DatasetReader()
     dataset_reader(path_original=conf('path.dataset.original'), path_prepared=conf('path.dataset.prepared'))
 
-    # print(datetime.datetime.now())
-    # # r = dataset_reader.original.copy()
-    # r = copy.deepcopy(dataset_reader.original)
-    # print(datetime.datetime.now())
+    saver = write_prepared_dataset
+    if dataset_reader.prepared is not None:
+        result = dataset_reader.prepared
+        saver = None
+        read_preparator = Preparation(SentimentReadPreparator())
+    elif dataset_reader.original is None:
+        print('No one dataset')
+        return None
+    else:
+        result = dataset_reader.original
+        read_preparator = Preparation(
+            CasePreparator(),
+            HtmlTagsPreparator(),
+            PunctuationPreparator(),
+            SpacePreparator(),
+            TextLemmPreparator(),
+            SentimentReadPreparator()
+        )
 
-    # result = []
-    # if dataset_reader.prepared is not None:
-    #     pass
-
-
-    pass
-
-#  todo
-# def prepare_and_save_dataset(original: list, conf: Configurator) -> list:
-#     # todo !!!
-#     pass
+    result = [read_preparator(datum) for datum in result]
+    if saver is not None:
+        print(6)
+        prepared = copy.deepcopy(result)
+        write_preparator = Preparation(SentimentWritePreparator())
+        prepared = [write_preparator(datum) for datum in prepared]
+        saver(prepared, conf)
 
 
 def run():
     conf = Configurator()
 
     dataset = get_dataset(conf)
-
-    # dataset_reader = DatasetReader()
-    # dataset_reader(path_original=conf('path.dataset.original'), path_prepared=conf('path.dataset.prepared'))
-
-    # todo !!!
-    # if dataset_reader.original is None:
-    #     print('No one dataset')
-    #     return
-    # prepare_and_save_dataset(dataset_reader.original, conf)
-
-    # restore
-    # if dataset_reader.prepared is None:
-    #     if dataset_reader.original is None:
-    #         print('No one dataset')
-    #         return
-    #     raw_dataset = prepare_and_save_dataset(dataset_reader.original, conf)
-    # else:
-    #     raw_dataset = dataset_reader.prepared
-    # print(raw_dataset)
+    if dataset is None:
+        return
 
 
 if __name__ == '__main__':
