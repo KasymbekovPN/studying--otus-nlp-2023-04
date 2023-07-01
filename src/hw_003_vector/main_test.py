@@ -220,6 +220,7 @@ def demo2():
     print(f'sentiment: {sentiments[idx]}')
     print(f'text: {texts[idx]}')
 
+    print(f'texts.size: {len(texts)}')
     train_texts, test_texts, train_y, test_y = train_test_split(texts,
                                                                 encoded_sentiments,
                                                                 test_size=0.2,
@@ -439,12 +440,10 @@ def demo5():
     pass
 
 
-
-
 if __name__ == '__main__':
-    demo0()
+    # demo0()
     # demo1()
-    # demo2()
+    demo2()
     # demo3()
     # demo4()
     # demo5()

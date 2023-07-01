@@ -50,6 +50,8 @@ def get_dataset(conf: Configurator) -> list[dict] | None:
         prepared = [write_preparator(datum) for datum in prepared]
         saver(prepared, conf)
 
+    return result
+
 
 def run():
     conf = Configurator()
