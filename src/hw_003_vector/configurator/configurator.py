@@ -10,22 +10,21 @@ class Configurator(BaseConfigurator):
             'train-test-split.test-size': 0.2,
             'train-test-split.random-stage': 42,
 
-            'vec.tfidf.max-features': 200,
+            'vec.tfidf.max-features': 300,
             'vec.tfidf.norm': None,
             'vec.tfidf.max-df': 0.95,
             'vec.tfidf.min-df': 5,
             'vec.tfidf.stop-words': 'english',
 
-            'hyper-params.on': True,
+            'hyper-params.on': False,
             'hyper-params.cv': 3,
             'hyper-params.scoring': 'accuracy',
             'hyper-params.verbose': 3,
             'hyper-params.jobs': -1,
             'hyper-params.param-grid': {
                 'max_depth': [3, None],
-                'n_estimators': [10, 100],
+                'n_estimators': [10, 100, 200],
             },
-            # todo !!! add comment
             # 'hyper-params.param-grid': {
             #     'max_depth': [3, 5, 10, None],
             #     'n_estimators': [10, 100, 200],
@@ -35,10 +34,14 @@ class Configurator(BaseConfigurator):
             # },
 
             # todo !!! change values cls.<...>
-            'cls.max-depth': None,
-            'cls.estimators': 500,
-            'cls.max-features': 10,
-            'cls.min-samples-leaf': 2,
-            'cls.min-samples-split': 1
+            'cls.max-depth': 3,
+            'cls.estimators': 50,
+
+            # 'cls.max-depth': None,
+            # 'cls.estimators': 200,
+            # todo !!!
+            # 'cls.max-features': None,
+            # 'cls.min-samples-leaf': None,
+            # 'cls.min-samples-split': None
         }
         super().__init__(params)

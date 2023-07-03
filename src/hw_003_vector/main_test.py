@@ -1,3 +1,5 @@
+# todo del
+
 import datetime
 
 import matplotlib.pylab as plt
@@ -296,7 +298,7 @@ def demo3():
 
     texts = [df.text.iloc[i].split() for i in range(len(df))]
 
-    model = Word2Vec(texts, window=5, min_count=5, workers=4)
+    model = Word2Vec(texts, window=5, min_count=5, workers=4, vector_size=200)
     model.save('../../datasets/twitter/word2v.model')
 
 
@@ -334,6 +336,12 @@ def demo4():
     for i in fd.most_common(500):
         top_words.append(i[0])
     print(top_words)
+
+    # model.tra
+
+    print(' ---- ', model.wv['школа'])
+    # print(' ++++ ', model.wv.key_to_index)
+    # print(' ++++ ', model.wv.index_to_key)
 
     top_words_vec = model.wv[top_words]
     print(f'top_words_vec.shape {top_words_vec.shape}')
@@ -443,7 +451,7 @@ def demo5():
 if __name__ == '__main__':
     # demo0()
     # demo1()
-    demo2()
+    # demo2()
     # demo3()
-    # demo4()
+    demo4()
     # demo5()

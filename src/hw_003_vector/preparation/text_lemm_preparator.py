@@ -7,7 +7,7 @@ class TextLemmPreparator:
     DOWNLOAD_TASKS = ['punkt', 'wordnet']
 
     def __init__(self, text_key='review'):
-        self._text_key = text_key;
+        self._text_key = text_key
         [nltk.download(task) for task in self.DOWNLOAD_TASKS]
 
     def __call__(self, *args, **kwargs):
