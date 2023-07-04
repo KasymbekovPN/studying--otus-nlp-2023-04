@@ -42,7 +42,7 @@ def get_model():
         return gensim.models.Word2Vec.load(model_path)
 
     # !!!
-    dataset_path = '../../datasets/IMDB Dataset.csv'
+    dataset_path = '../hw_003_vector/jupyter/IMDB Dataset.csv'
     frame = pd.read_csv(dataset_path, sep=',', usecols=[0])
 
     words_only = WordsOnly(pattern=re.compile("[А-Яа-я:=!)(A-z_%/|]+"))
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     vs = Vectors(model.wv)
     x = avg_embedding(vs, 'Hello world')
 
-    dataset_path = '../../datasets/IMDB Dataset.csv'
+    dataset_path = '../hw_003_vector/jupyter/IMDB Dataset.csv'
     frame = pd.read_csv(dataset_path, sep=',', usecols=[0])
     corpus = [row['review'] for index, row in frame.iterrows()]
 

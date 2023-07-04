@@ -158,18 +158,19 @@ def run1():
     # )
     # current_time = print_timediff('slice', current_time)
 
-    path = '../../datasets/GoogleNews-vectors-negative300.bin'
-    # path = '../../datasets/word2vec-google-news-300.model'
+    # path = '../../datasets/GoogleNews-vectors-negative300.bin'
+    path = '../../datasets/word2vec-google-news-300.model'
+    # path = '../../datasets/word2vec-google-news-300.model.vectors.npy'
     # path = '../../datasets/word2vec-google-news-300.bin'
 
     # w2v_model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
 
-    gensim.models.Word2Vec()
+    # gensim.models.Word2Vec()
 
     # model = gensim.models.TfidfModel.load(path)
     # model = gensim.models.Word2Vec.load(path)
-    model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
-    # model = gensim.models.KeyedVectors.load(path)
+    # model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
+    model = gensim.models.KeyedVectors.load(path)
     # model = gensim.models.keyedvectors.load_word2vec_format(path)
     # model = gensim.models.keyedvectors.Word2VecKeyedVectors.load_word2vec_format(path, binary=True)
     print(type(model))
@@ -188,6 +189,6 @@ def run2():
 
 
 if __name__ == '__main__':
-    run()
-    # run1()
+    # run()
+    run1()
     # run2()
