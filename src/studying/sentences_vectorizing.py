@@ -94,43 +94,11 @@ def tfidf_embedding(vectors: Vectors, sentence: str, vectorizer):
     print(v.shape)
     print(v)
 
-    pass
-
-# def similarity_values_wrapper(use_word2vec=True, use_fasttext=True, distance_function=cosine_distances):
-#     def get_similarity_values(sentences):
-#         sent_vector = [[]]*len(sentences)
-#         weights_data = tf_idf_vectorizer.transform(sentences).tocoo()
-#         for row, col, weight in zip(weights_data.row, weights_data.col, weights_data.data):
-#             sent_vector[row].append(weight*vectorize(vocab[col], use_word2vec, use_fasttext))
-#
-#         for row in range(len(sent_vector)):
-#             if not sent_vector[row]:
-#                 sent_vector.append((len(vectorize('zoros_vector'))))
-#         sent_vector = np.sum(sent_vector, axis=1)
-#         distances = distance_function(sent_vector, sent_vector)
-#         return distances
-#     return get_similarity_values
-
-
-
 
 if __name__ == '__main__':
-    # m = gensim.models.Word2Vec.load('../../datasets/enwiki_20180420_nolg_300d.txt')
-
-    # print(datetime.datetime.now())
-    # m = gensim.models.keyedvectors.load_word2vec_format('../../datasets/enwiki_20180420_nolg_300d.txt')
-    # print(type(m))
-    # print(datetime.datetime.now())
-
     model = get_model()
-
-    # sentence = 'Hello world I am code'.split()
-    # for word in sentence:
-    #     v = get_vector(word, model.wv)
-    #     print(v)
-
     vs = Vectors(model.wv)
-    x = avg_embedding(vs, 'Hello world')
+    avg_embedding(vs, 'Hello world')
 
     dataset_path = '../hw_003_vector/jupyter/IMDB Dataset.csv'
     frame = pd.read_csv(dataset_path, sep=',', usecols=[0])
@@ -138,9 +106,5 @@ if __name__ == '__main__':
 
     tf_idf_vectorizer = TfidfVectorizer()
     tf_idf_vectorizer.fit(corpus)
-    # vocab = tf_idf_vectorizer.get_feature_names_out()
 
-    x = tfidf_embedding(vs, 'Hello world I am Oz', tf_idf_vectorizer)
-
-
-    pass
+    tfidf_embedding(vs, 'Hello world I am Oz', tf_idf_vectorizer)

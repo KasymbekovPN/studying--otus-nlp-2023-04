@@ -25,23 +25,7 @@ class Configurator(BaseConfigurator):
                 'max_depth': [3, None],
                 'n_estimators': [10, 100, 200],
             },
-            # 'hyper-params.param-grid': {
-            #     'max_depth': [3, 5, 10, None],
-            #     'n_estimators': [10, 100, 200],
-            #     'max_features': [1, 5, 10],
-            #     'min_samples_leaf': [1, 2, 3],
-            #     'min_samples_split': [1, 2, 3]
-            # },
-
-            # todo !!! change values cls.<...>
             'cls.max-depth': 3,
             'cls.estimators': 50,
-
-            # 'cls.max-depth': None,
-            # 'cls.estimators': 200,
-            # todo !!!
-            # 'cls.max-features': None,
-            # 'cls.min-samples-leaf': None,
-            # 'cls.min-samples-split': None
         }
         super().__init__(params)

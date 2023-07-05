@@ -1,5 +1,3 @@
-# todo del
-
 import datetime
 
 import matplotlib.pylab as plt

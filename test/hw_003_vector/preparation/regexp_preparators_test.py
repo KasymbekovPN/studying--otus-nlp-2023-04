@@ -5,7 +5,6 @@ from parameterized import parameterized
 from src.hw_003_vector.preparation.regexp_preparators import RegexPreparator, HtmlTagsPreparator, PunctuationPreparator, SpacePreparator
 
 
-# todo del
 class TestCase(unittest.TestCase):
 
     @parameterized.expand([

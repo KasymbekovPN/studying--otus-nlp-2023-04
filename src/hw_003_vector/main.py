@@ -71,7 +71,6 @@ def print_timediff(tag, prev_time):
     return current
 
 
-# todo rename
 def run():
     conf = Configurator()
 
@@ -100,11 +99,7 @@ def run():
     test_X = vectorizer.transform(test_x)
     current_time = print_timediff('vectorizering', current_time)
 
-    # todo !!!
-    # tfidf = Tfidfvectorizer()
-    # dict(zip(tfidf.get_feature_names(), tfidf.idf_)))
     x = dict(zip(vectorizer.get_feature_names_out(), vectorizer.idf_))
-
 
     if conf('hyper-params.on'):
         print('Hyperparams search started')
@@ -125,10 +120,6 @@ def run():
         clf = RandomForestClassifier(
             n_estimators=conf('cls.estimators'),
             max_depth=conf('cls.max-depth'),
-            # todo !!!
-            # max_features=conf('cls.max-features'),
-            # min_samples_split=conf('cls.min-samples-leaf'),
-            # min_samples_leaf=conf('cls.min-samples-split'),
         )
 
     clf.fit(train_X, train_y)
@@ -140,55 +131,5 @@ def run():
     _ = print_timediff('metrics', current_time)
 
 
-# todo rename
-def run1():
-    # conf = Configurator()
-    #
-    # dataset = get_dataset(conf)
-    # if dataset is None:
-    #     return
-    #
-    # current_time = datetime.datetime.now()
-    # train_x, test_x, train_y, test_y = train_test_split(
-    #     dataset.get_column('review'),
-    #     dataset.get_column('sentiment', 'int_sentiment'),
-    #     test_size=conf('train-test-split.test-size'),
-    #     random_state=conf('train-test-split.random-stage'),
-    #     stratify=dataset.get_column('sentiment', 'str_sentiment')
-    # )
-    # current_time = print_timediff('slice', current_time)
-
-    # path = '../../datasets/GoogleNews-vectors-negative300.bin'
-    path = '../../datasets/word2vec-google-news-300.model'
-    # path = '../../datasets/word2vec-google-news-300.model.vectors.npy'
-    # path = '../../datasets/word2vec-google-news-300.bin'
-
-    # w2v_model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
-
-    # gensim.models.Word2Vec()
-
-    # model = gensim.models.TfidfModel.load(path)
-    # model = gensim.models.Word2Vec.load(path)
-    # model = gensim.models.KeyedVectors.load_word2vec_format(path, binary=True)
-    model = gensim.models.KeyedVectors.load(path)
-    # model = gensim.models.keyedvectors.load_word2vec_format(path)
-    # model = gensim.models.keyedvectors.Word2VecKeyedVectors.load_word2vec_format(path, binary=True)
-    print(type(model))
-
-    # gensim.models.word2vec.Word2Vec()
-
-    # print(model.mv['the'])
-
-    pass
-
-
-def run2():
-    import pybind11
-    print(pybind11.__file__)
-    pass
-
-
 if __name__ == '__main__':
-    # run()
-    run1()
-    # run2()
+    run()
