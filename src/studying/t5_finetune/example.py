@@ -1,6 +1,7 @@
 import os
 import pathlib
 
+import torch
 import wget
 import numpy as np
 import pandas as pd
@@ -23,7 +24,7 @@ MODEL_TO_HUB_NAME = {
 ACCURACY = load_metric('accuracy', keep_in_memory=True)
 MCC = load_metric('matthews_correlation', keep_in_memory=True)
 
-N_SEEDS = 10
+N_SEEDS = 1
 N_EPOCHS = 20
 LR_VALUES = (1e-4, 1e-3)
 DECAY_VALUES = (0, 1e-4)
@@ -183,11 +184,14 @@ def run():
     data_collator = DataCollatorForSeq2Seq(tokenizer, pad_to_multiple_of=8)
     dev_metrics_per_run = np.empty((N_SEEDS, len(LR_VALUES), len(DECAY_VALUES), len(BATCH_SIZES), 2))
 
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
     for i, learning_rate in enumerate(LR_VALUES):
         for j, weight_decay in enumerate(DECAY_VALUES):
             for k, batch_size in enumerate(BATCH_SIZES):
                 for seed in range(N_SEEDS):
                     model = T5ForConditionalGeneration.from_pretrained(MODEL_TO_HUB_NAME[MODEL_NAME])
+                    model.to(device)
                     run_base_dir = f'{MODEL_NAME}_{learning_rate}_{weight_decay}_{batch_size}'
 
                     training_args = create_training_args(run_base_dir, batch_size, learning_rate, weight_decay, seed)
