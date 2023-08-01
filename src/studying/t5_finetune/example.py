@@ -225,7 +225,7 @@ def run():
                     predictions = trainer.predict(test_dataset=tokenized_splits['test'], max_length=10)
                     string_preds = tokenizer.batch_decode(predictions.predictions, skip_special_tokens=True)
 
-                    int_preds = [1 if predictions == POS_LABEL else 0 for prediction in string_preds]
+                    int_preds = [1 if prediction == POS_LABEL else 0 for prediction in string_preds]
                     int_preds = np.asarray(int_preds)
 
                     np.save(f'results/{run_base_dir}_{seed}/preds.npy', int_preds)
@@ -235,5 +235,21 @@ def run():
     np.save(f'result_agg/{MODEL_NAME}_dev.npy', dev_metrics_per_run)
 
 
+def load_npy():
+    path = f'result_agg/{MODEL_NAME}_dev.npy'
+    data = np.load(path)
+
+    for seed_datum_id, seed_datum in enumerate(data):
+        print(f'seed id: {seed_datum_id}')
+        for lr_datum_id, lr_datum in enumerate(seed_datum):
+            print(f'\tlr id: {lr_datum_id}')
+            for weight_datum_id, weight_datum in enumerate(lr_datum):
+                print(f'\t\tweight id: {weight_datum_id}')
+                for batch_size_id, batch_size in enumerate(weight_datum):
+                    print(f'\t\t\tbatch size id: {batch_size_id} | acc = {batch_size[0]} | mcc = {batch_size[1]}')
+
+
 if __name__ == '__main__':
-    run()
+    # run()
+    load_npy()
+
