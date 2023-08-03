@@ -9,7 +9,6 @@ from sklearn.metrics import f1_score
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, T5Tokenizer, T5ForConditionalGeneration, \
     get_scheduler, get_linear_schedule_with_warmup
 
-
 PRETRAINED_PATH = "ai-forever/ruT5-base"
 
 
@@ -25,12 +24,12 @@ class EvalDataset(Dataset):
 
     def __getitem__(self, item):
         output = self._tokenize(self._text[item])
-        return {k: v.reshape(-1).to(self._device) for k, v in output.items() }
+        return {k: v.reshape(-1).to(self._device) for k, v in output.items()}
 
     def _tokenize(self, text):
         return self._tokenizer(text,
                                return_tensors='pt',
-                               paddind='max_length',
+                               padding='max_length',
                                truncation=True,
                                max_length=self._length)
 
@@ -54,7 +53,7 @@ class TrainDataset(Dataset):
         output = {k: v.reshape(-1).to(self._device) for k, v in output.items()}
 
         label = self.POS_LABEL if self._label[item] == 1 else self.NEG_LABEL
-        label = self._tokenize(label, length=2).input_ids.respape(-1).to(self._device)
+        label = self._tokenize(label, length=2).input_ids.reshape(-1).to(self._device)
 
         output.update({'labels': label})
         return output
@@ -87,7 +86,7 @@ def train_model(model,
                 train_ds_len):
     model.train()
     for epoch in range(n_epochs):
-        print(f'EPOCH {epoch+1} of {n_epochs}')
+        print(f'EPOCH {epoch + 1} of {n_epochs}')
         for batch_id, batch in enumerate(train_dataloader):
             outputs = model(**batch)
             loss = outputs.loss
@@ -103,8 +102,7 @@ def train_model(model,
             scheduler.step()
             optimizer.zero_grad()
 
-# < !!!
-#       pos_label - gen_tok = [1 if 2937 in i else 0 for i in gen_tok]  # tokenizer.decode(2937) == 'верно'
+
 def test_model(model, dataloader, pos_label):
     model.eval()
     result = np.array([])
@@ -130,42 +128,48 @@ def run():
     # print(x)
     # print(tokenizer.decode(2937))
     # print(2937 in x['input_ids'])
-
     # print(tokenizer.)
-
     #             gen_tok = [1 if 2937 in i else 0 for i in gen_tok]  # tokenizer.decode(2937) == 'верно'
 
-    # train_ds = TrainDataset(train['sentence'], train['acceptable'])
-    # train_dataloader = DataLoader(train_ds, batch_size=32, shuffle=True)
-    #
-    # eval_ds = TrainDataset(val['sentence'], val['acceptable'])
-    # eval_dataloader = DataLoader(eval_ds, batch_size=32)
-    #
-    # test_ds = EvalDataset(test['sentence'])
-    # test_dataloader = DataLoader(test_ds, batch_size=32)
+    train_eval_df = pd.read_csv('../../hw_004_bert_gpt3_t5_practice/train_dataset.csv', usecols=[1, 2])
+    idx = train_eval_df.sample(frac=0.9, random_state=42).index
+    val_df = train_eval_df[~train_eval_df.index.isin(idx)]
+    train_df = train_eval_df[train_eval_df.index.isin(idx)]
+    test_df = pd.read_csv('../../hw_004_bert_gpt3_t5_practice/test_dataset.csv', usecols=[1, 2])
 
-    # -----------------------
+    batch_size = 32
 
-    # optimizer = Adam(model.parameters(), lr=1e-5)
-    #
-    # num_epochs = 2
-    # num_training_steps = num_epochs * len(train_dataloader)
-    # lr_scheduler = get_scheduler(
-    #     "linear",
-    #     optimizer=optimizer,
-    #     num_warmup_steps=0,
-    #     num_training_steps=num_training_steps
-    # )
+    train_ds = TrainDataset(train_df['sentence'], train_df['acceptable'], tokenizer, 64, device)
+    train_dataloader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 
-    # -------------------------
+    eval_ds = TrainDataset(val_df['sentence'], val_df['acceptable'], tokenizer, 64, device)
+    eval_dataloader = DataLoader(eval_ds, batch_size=32)
 
-    # --------------------------
+    # rename EvalDataset
+    test_ds = EvalDataset(test_df['sentence'], tokenizer, 64, device)
+    test_dataloader = DataLoader(test_ds, batch_size=batch_size)
+
+    optimizer = Adam(model.parameters(), lr=1e-5)
+
+    num_epochs = 2
+    num_training_steps = num_epochs * len(train_dataloader)
+    scheduler = get_scheduler('linear', optimizer=optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
+
+    train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, num_epochs, len(train_ds))
+
+    pos_label = tokenizer(TrainDataset.POS_LABEL,
+                          return_tensors='pt',
+                          padding='max_length',
+                          truncation=True,
+                          max_length=2)['input_ids'][0][0].item()
+    y_prediction = test_model(model, test_dataloader, pos_label)
+
+    print(f'F1 score: {f1_score(y_prediction, test_df["acceptable"])}')
 
     # train_model(train_dataloader, num_epochs)
-
-    # *--------------------
-
+    # *-------------------
     # y_pred = test_model(test_dataloader, eval=False)
+
     # print(f'F1-score = {f1_score(y_pred, test["acceptable"]):>3f}\n')
 
     pass
