@@ -2,17 +2,19 @@ import torch
 import pandas as pd
 import numpy as np
 
-from tqdm import tqdm
 from torch.utils.data import Dataset, DataLoader
 from torch.optim import Adam
-from sklearn.metrics import f1_score
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, T5Tokenizer, T5ForConditionalGeneration, \
-    get_scheduler, get_linear_schedule_with_warmup
+from sklearn.metrics import f1_score, matthews_corrcoef
+from transformers import (
+    T5Tokenizer,
+    T5ForConditionalGeneration,
+    get_linear_schedule_with_warmup
+)
 
 PRETRAINED_PATH = "ai-forever/ruT5-base"
 
 
-class EvalDataset(Dataset):
+class TestDataset(Dataset):
     def __init__(self, text, tokenizer, length, device):
         self._text = text.reset_index(drop=True)
         self._tokenizer = tokenizer
@@ -116,20 +118,13 @@ def test_model(model, dataloader, pos_label):
 
 def run():
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-    tokenizer = AutoTokenizer.from_pretrained(PRETRAINED_PATH, use_fast=False)
+    tokenizer = T5Tokenizer.from_pretrained(PRETRAINED_PATH, use_fast=False)
+    # tokenizer = AutoTokenizer.from_pretrained(PRETRAINED_PATH, use_fast=False)
     model = T5ForConditionalGeneration.from_pretrained(PRETRAINED_PATH)
-    model.to(device)
 
-    # x = tokenizer(TrainDataset.POS_LABEL,
-    #               return_tensors='pt',
-    #               padding='max_length',
-    #               truncation=True,
-    #               max_length=2)
-    # print(x)
-    # print(tokenizer.decode(2937))
-    # print(2937 in x['input_ids'])
-    # print(tokenizer.)
-    #             gen_tok = [1 if 2937 in i else 0 for i in gen_tok]  # tokenizer.decode(2937) == 'верно'
+
+
+    model.to(device)
 
     train_eval_df = pd.read_csv('../../hw_004_bert_gpt3_t5_practice/train_dataset.csv', usecols=[1, 2])
     idx = train_eval_df.sample(frac=0.9, random_state=42).index
@@ -146,14 +141,19 @@ def run():
     eval_dataloader = DataLoader(eval_ds, batch_size=32)
 
     # rename EvalDataset
-    test_ds = EvalDataset(test_df['sentence'], tokenizer, 64, device)
+    test_ds = TestDataset(test_df['sentence'], tokenizer, 64, device)
     test_dataloader = DataLoader(test_ds, batch_size=batch_size)
 
     optimizer = Adam(model.parameters(), lr=1e-5)
 
     num_epochs = 2
     num_training_steps = num_epochs * len(train_dataloader)
-    scheduler = get_scheduler('linear', optimizer=optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
+    # scheduler = get_scheduler('linear', optimizer=optimizer, num_warmup_steps=0, num_training_steps=num_training_steps)
+    scheduler = get_linear_schedule_with_warmup(
+        optimizer=optimizer,
+        num_warmup_steps=0,
+        num_training_steps=num_training_steps
+    )
 
     train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, num_epochs, len(train_ds))
 
@@ -165,14 +165,9 @@ def run():
     y_prediction = test_model(model, test_dataloader, pos_label)
 
     print(f'F1 score: {f1_score(y_prediction, test_df["acceptable"])}')
-
-    # train_model(train_dataloader, num_epochs)
-    # *-------------------
-    # y_pred = test_model(test_dataloader, eval=False)
-
-    # print(f'F1-score = {f1_score(y_pred, test["acceptable"]):>3f}\n')
-
-    pass
+    print(f'F1 score: {f1_score(test_df["acceptable"], y_prediction)}')
+    print(f'MCC: {matthews_corrcoef(y_prediction, test_df["acceptable"])}')
+    print(f'MCC: {matthews_corrcoef(test_df["acceptable"], y_prediction)}')
 
 
 if __name__ == '__main__':
