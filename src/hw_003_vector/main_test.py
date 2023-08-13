@@ -104,7 +104,7 @@ def num2label(y: str) -> str:
 
 
 def demo0() -> None:
-    with open('../../datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
+    with open('../../Datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
         data = json.load(json_file)
 
     sentiments = get_sentiment_set(data)
@@ -157,13 +157,13 @@ def demo0() -> None:
 
 # bag of words
 def demo1():
-    with open('../../datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
+    with open('../../Datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
         data = json.load(json_file)
 
     sentiments = [datum['sentiment'] for datum in data]
     encoded_sentiments = [label2num(label) for label in sentiments]
 
-    path = '../../datasets/kazakh_news/text_lemmatized.txt'
+    path = '../../Datasets/kazakh_news/text_lemmatized.txt'
     texts = [line.replace('\n', '') for line in open(path, encoding='utf-8').readlines()]
 
     idx = 1
@@ -207,13 +207,13 @@ def demo1():
 
 # tf-idf
 def demo2():
-    with open('../../datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
+    with open('../../Datasets/kazakh_news/train.json', encoding='utf-8') as json_file:
         data = json.load(json_file)
 
     sentiments = [datum['sentiment'] for datum in data]
     encoded_sentiments = [label2num(label) for label in sentiments]
 
-    path = '../../datasets/kazakh_news/text_lemmatized.txt'
+    path = '../../Datasets/kazakh_news/text_lemmatized.txt'
     texts = [line.replace('\n', '') for line in open(path, encoding='utf-8').readlines()]
 
     idx = 1
@@ -268,11 +268,11 @@ def demo3():
     text0 = 'g;iuhoikl 7.kjh 87h одлжд :))'
     print(words_only(text0))
 
-    df_pos = pd.read_csv('../../datasets/twitter/positive.csv', sep=';', header=None, usecols=[3])
+    df_pos = pd.read_csv('../../Datasets/twitter/positive.csv', sep=';', header=None, usecols=[3])
     print('\nPositive tail')
     print(df_pos.tail(3))
 
-    df_neg = pd.read_csv('../../datasets/twitter/negative.csv', sep=';', header=None, usecols=[3])
+    df_neg = pd.read_csv('../../Datasets/twitter/negative.csv', sep=';', header=None, usecols=[3])
     print('\nNegative head')
     print(df_neg.head(3))
 
@@ -289,7 +289,7 @@ def demo3():
 
     df.text = df.text.apply(words_only)
 
-    df = pd.read_csv('../../datasets/twitter/processed_text.csv', index_col=0)
+    df = pd.read_csv('../../Datasets/twitter/processed_text.csv', index_col=0)
     print('\nProcessed text')
     print(df.head())
     print(f'df.shape: {df.shape}')
@@ -297,12 +297,12 @@ def demo3():
     texts = [df.text.iloc[i].split() for i in range(len(df))]
 
     model = Word2Vec(texts, window=5, min_count=5, workers=4, vector_size=200)
-    model.save('../../datasets/twitter/word2v.model')
+    model.save('../../Datasets/twitter/word2v.model')
 
 
 # 10 vector representation
 def demo4():
-    model = Word2Vec.load('../../datasets/twitter/word2v.model')
+    model = Word2Vec.load('../../Datasets/twitter/word2v.model')
 
     print('model.wv.most_similar("школа")')
     print(model.wv.most_similar("школа"))
@@ -320,7 +320,7 @@ def demo4():
     print('model.wv.doesnt_match("ночь улица фонарь аптека".split())')
     print(model.wv.doesnt_match("ночь улица фонарь аптека".split()))
 
-    df = pd.read_csv('../../datasets/twitter/processed_text.csv', index_col=0)
+    df = pd.read_csv('../../Datasets/twitter/processed_text.csv', index_col=0)
     print('\nProcessed text')
     print(df.head())
     print(f'df.shape: {df.shape}')
@@ -382,7 +382,7 @@ def demo4():
 def demo5():
     stop_words = load_stop_words()
 
-    # df = pd.read_csv('../../datasets/twitter/processed_text.csv', index_col=0)
+    # df = pd.read_csv('../../Datasets/twitter/processed_text.csv', index_col=0)
     # texts = [row['text'] for idx, row in df.iterrows()]
     # content = ''
     # delimiter = ''
