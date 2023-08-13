@@ -4,8 +4,8 @@ from src.common.base_configurator import BaseConfigurator
 class Configurator(BaseConfigurator):
     def __init__(self) -> None:
         params = {
-            'path.dataset.original': '../../datasets/IMDB Dataset.csv',
-            'path.dataset.prepared': '../../datasets/prepared IMDB Dataset.csv',  # filtered & lemmatized dataset
+            'path.dataset.original': '../../Datasets/IMDB Dataset.csv',
+            'path.dataset.prepared': '../../Datasets/prepared IMDB Dataset.csv',  # filtered & lemmatized dataset
 
             'train-test-split.test-size': 0.2,
             'train-test-split.random-stage': 42,
