@@ -2,8 +2,7 @@ import os
 import shutil
 import wget
 import zipfile
-
-import pandas as pd
+import json
 
 
 class DefaultCheckStrategy:
@@ -79,7 +78,10 @@ class DefaultPreparationStrategy:
 
 
 class Downloader:
-    def __init__(self,
+    def __init__(self, output: str) -> None:
+        self._output = output + '.json'
+
+    def download(self,
                  directory_path: str,
                  paths: dict,
                  check_strategy,
@@ -92,7 +94,6 @@ class Downloader:
             download_strategy(directory_path=directory_path)
             data = preparation_strategy(directory_path=directory_path, paths=paths)
 
-        self._data = {key: pd.read_json(value, lines=True) for key, value in data.items()}
+        with open(self._output, 'w') as f:
+            json.dump(data, f)
 
-    def get(self, key: str):
-        return self._data[key] if key in self._data else None
