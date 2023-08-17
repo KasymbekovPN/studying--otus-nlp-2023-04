@@ -74,7 +74,7 @@ class DefaultPreparationStrategy:
             except Exception as e:
                 print(e)
 
-        return result
+        return {key: value['new'] for key, value in result.items()}
 
 
 class Downloader:
