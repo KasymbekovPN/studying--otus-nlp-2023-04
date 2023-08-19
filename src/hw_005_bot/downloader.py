@@ -4,6 +4,8 @@ import wget
 import zipfile
 import json
 
+from pathlib import Path
+
 
 class DefaultCheckStrategy:
 
@@ -94,6 +96,6 @@ class Downloader:
             download_strategy(directory_path=directory_path)
             data = preparation_strategy(directory_path=directory_path, paths=paths)
 
+        content = {Path(key).stem: value for key, value in data.items()}
         with open(self._output, 'w') as f:
-            json.dump(data, f)
-
+            json.dump(content, f)
