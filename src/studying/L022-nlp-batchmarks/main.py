@@ -17,6 +17,10 @@ from transformers import (
     TrainingArguments,
     EvalPrediction,
     set_seed,
+
+    T5Tokenizer,
+    T5ForConditionalGeneration
+
 )
 
 from datasets import Dataset, DatasetDict
