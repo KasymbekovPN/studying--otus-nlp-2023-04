@@ -4,7 +4,7 @@ from flask import Flask, request, Response
 
 import config
 
-bot = telebot.TeleBot(config.token)
+bot = telebot.TeleBot(config.get_token())
 app = Flask(__name__)
 
 
