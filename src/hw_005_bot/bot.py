@@ -12,7 +12,8 @@ FLASK_ABORT_CODE = 403
 ROUTE_RULE = '/'
 ROUTE_METHODS = ['POST', 'GET']
 ENCODING = 'utf-8'
-COMMANDS = ['start', 'help', 'state']
+# todo del
+# COMMANDS = ['start', 'help', 'state']
 
 
 def run(host, port, token):
@@ -29,36 +30,49 @@ def run(host, port, token):
             update = telebot.types.Update.de_json(
                 request.stream.read().decode(ENCODING)
             )
-            bot.process_new_updates([update])
-            print(12345)
+            # todo del
+            # print(type(update))
+            # print(update)
+            # print(update.message)
+            # print(update.message.from_user.id)
+            # print(update.message.text)
+            engine.set_update(update)
+
+            # todo del
+            # bot.send_message(update.message.from_user.id, f'echo: {update.message.text}')
+            # bot.process_new_updates([update])
+            # print(12345)
             return ''
         flask_abort()
         return Response('ok', status=200) if request.method == 'POST' else ' '
 
-    @bot.message_handler(commands=COMMANDS)
-    def handle_command(message):
-        # todo: !!!
-        #     bot.send_message(message.chat.id, 'hello')
-        # <
-        # print(message.chat_id)
-        bot.send_message(message.chat.id, '!!! command')
-        # print(message.chat_id)
-        # engine.set_command(message.chat_id, message.text)
+    # todo del
+    # @bot.message_handler(commands=COMMANDS)
+    # def handle_command(message):
+    #     # todo: !!!
+    #     #     bot.send_message(message.chat.id, 'hello')
+    #     # <
+    #     # print(message.chat_id)
+    #     bot.send_message(message.chat.id, '!!! command')
+    #     # print(message.chat_id)
+    #     # engine.set_command(message.chat_id, message.text)
 
-    @bot.message_handler(regexp='/.*')
-    def handle_unknown_command(message):
-        bot.send_message(message.chat.id, f'{message.text} - неизвестная команда!')
+    # todo del
+    # @bot.message_handler(regexp='/.*')
+    # def handle_unknown_command(message):
+    #     bot.send_message(message.chat.id, f'{message.text} - неизвестная команда!')
 
-    @bot.message_handler(content_types=['text'])
-    def handle_text_message(message):
-        # todo: !!!
-        #     text = f'echo: {message.text}'
-        #     bot.send_message(message.chat.id, text)
-        #<
-        text = f'echo: {message.text}'
-        bot.send_message(message.chat.id, text)
-        #<
-        # engine.set_task(message.chat_id, message.text)
+    # todo del
+    # @bot.message_handler(content_types=['text'])
+    # def handle_text_message(message):
+    #     # todo: !!!
+    #     #     text = f'echo: {message.text}'
+    #     #     bot.send_message(message.chat.id, text)
+    #     #<
+    #     text = f'echo: {message.text}'
+    #     bot.send_message(message.chat.id, text)
+    #     #<
+    #     # engine.set_task(message.chat_id, message.text)
 
     app.run(host, port)
 
