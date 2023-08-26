@@ -20,19 +20,31 @@ class DeterminationResult:
 
     def __init__(self,
                  kind: int,
-                 raw_text: str,
-                 command: str | None,
                  text: str | None,
                  strategy=BaseEngineStrategy()) -> None:
-        self.kind = kind
-        self.raw_text = raw_text
-        self.command = command
-        self.text = text
+        self._kind = kind
+        self._text = text
         self._strategy = strategy
 
     def __repr__(self):
         kind = self.kind if self.kind in self.KIND_NAMES else self.KIND_UNKNOWN
-        return f'{{kind: {self.KIND_NAMES[kind]}, command: {self.command}, text: {self.text}, raw_text: {self.raw_text} }}'
+        return f'{{kind: {self.KIND_NAMES[kind]}, text: {self.text} }}'
+
+    @property
+    def kind(self):
+        return self._kind
+
+    @kind.setter
+    def kind(self, value):
+        raise RuntimeError('Setter for kind is not supported')
+
+    @property
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        raise RuntimeError('Setter for value is not supported')
 
     @property
     def strategy(self):
@@ -43,33 +55,29 @@ class DeterminationResult:
         raise RuntimeError('Setter for strategy is not supported')
 
     @staticmethod
-    def create_for_unknown(raw_text: str):
-        r = DeterminationResult(DeterminationResult.KIND_UNKNOWN, raw_text, None, None)
+    def create_for_unknown(text: str):
+        r = DeterminationResult(DeterminationResult.KIND_UNKNOWN, text)
         return r
 
     @staticmethod
-    def create_for_spec_command(raw_text: str, command: str, strategy: BaseEngineStrategy):
-        r = DeterminationResult(DeterminationResult.KIND_SPEC_COMMAND, raw_text, command, None, strategy)
+    def create_for_spec_command(text: str, strategy: BaseEngineStrategy):
+        r = DeterminationResult(DeterminationResult.KIND_SPEC_COMMAND, text, strategy)
         return r
 
     @staticmethod
-    def create_for_unknown_command(raw_text: str, command: str):
+    def create_for_unknown_command(text: str):
         r = DeterminationResult(
             DeterminationResult.KIND_UNKNOWN_COMMAND,
-            raw_text,
-            command,
-            None,
+            text,
             UnknownCommandEngineStrategy()
         )
         return r
 
     @staticmethod
-    def create_for_text(raw_text: str):
+    def create_for_text(text: str):
         r = DeterminationResult(
             DeterminationResult.KIND_TEXT,
-            raw_text,
-            None,
-            raw_text,
+            text,
             TextEngineStrategy()
         )
         return r

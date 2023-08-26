@@ -1,10 +1,7 @@
 from telebot import TeleBot
 
 from src.hw_005_bot.user.users import Users
-# todo del
-from src.hw_005_bot.user.user import User
 from src.hw_005_bot.execution.task_queue import TaskQueue
-# from src.hw_005_bot.message.processing.determinant.result import DeterminationResult
 
 
 class BaseEngineStrategy:

@@ -20,7 +20,7 @@ class SpecificCommandDeterminant(BaseDeterminant):
 
     def _determinate(self, text: str | None) -> DeterminationResult | None:
         if self._command == text:
-            return DeterminationResult.create_for_spec_command(text, text[1:], self._strategy)
+            return DeterminationResult.create_for_spec_command(text, self._strategy)
         return None
 
 
@@ -32,7 +32,7 @@ class AnyCommandDeterminant(BaseDeterminant):
         if text is not None:
             match = self._re.match(text)
             if match is not None and len(text) == self._re.match(text).span()[1]:
-                return DeterminationResult.create_for_unknown_command(text, text[1:])
+                return DeterminationResult.create_for_unknown_command(text)
         return None
 
 
