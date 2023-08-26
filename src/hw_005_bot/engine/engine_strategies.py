@@ -89,8 +89,20 @@ class TextEngineStrategy(BaseEngineStrategy):
                 task_queue: TaskQueue,
                 users: Users,
                 update: Update):
-        # todo impl
-        bot.send_message(user_id, f'text ECHO: {result}')
+        user = users.get_or_add(user_id)
+        if user.state == User.PASSAGE_STATE:
+            user.passage = result.text
+            text = self._create_passage_question_answer('Задан новый пассаж:', user)
+        elif user.state == User.QUESTION_STATE:
+            user.question = result.text
+            text = self._create_passage_question_answer('Задан новый вопрос:', user)
+        else:
+            text = 'Перед вводом вопроса или пассажа введите соответствующие команды ( /question /passage ).'
+        bot.send_message(user_id, text)
+
+    @staticmethod
+    def _create_passage_question_answer(title: str, user: User):
+        return f'{title}\n\nТекущий вопрос:\n\n{user.question}\n\nТекущий пассаж:\n\n{user.passage}'
 
 
 if __name__ == '__main__':
