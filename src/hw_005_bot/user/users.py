@@ -5,8 +5,9 @@ class Users:
     def __init__(self) -> None:
         self._users = {}
 
-    def __repr__(self):
-        return f'Users {self._users}'
+    # todo ???
+    # def __repr__(self):
+    #     return f'Users {self._users}'
 
     def add(self, user_id: int) -> User | None:
         if user_id in self._users:

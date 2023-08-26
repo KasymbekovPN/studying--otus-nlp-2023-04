@@ -1,6 +1,7 @@
 import re
 
 from src.hw_005_bot.message.processing.determinant.result import DeterminationResult
+from src.hw_005_bot.engine.engine_strategies import BaseEngineStrategy
 
 
 class BaseDeterminant:
@@ -13,12 +14,13 @@ class BaseDeterminant:
 
 
 class SpecificCommandDeterminant(BaseDeterminant):
-    def __init__(self, command: str) -> None:
+    def __init__(self, command: str, strategy: BaseEngineStrategy) -> None:
         self._command = command
+        self._strategy = strategy
 
     def _determinate(self, text: str | None) -> DeterminationResult | None:
         if self._command == text:
-            return DeterminationResult.create_for_spec_command(text, text[1:])
+            return DeterminationResult.create_for_spec_command(text, text[1:], self._strategy)
         return None
 
 
@@ -30,7 +32,7 @@ class AnyCommandDeterminant(BaseDeterminant):
         if text is not None:
             match = self._re.match(text)
             if match is not None and len(text) == self._re.match(text).span()[1]:
-                return DeterminationResult.create_for_command(text, text[1:])
+                return DeterminationResult.create_for_unknown_command(text, text[1:])
         return None
 
 
@@ -46,34 +48,34 @@ class DefaultDeterminant(BaseDeterminant):
 # todo del
 if __name__ == '__main__':
 
-    commands = [
-        None,
-        '',
-        'start',
-        '/help',
-        'x123 /help',
-        '/help 1234',
-        '/start'
-    ]
-
-    def test(determinant, commands_):
-        for command in commands_:
-            print(f'{command} <> {determinant(text=command)}')
-
-    print(' --- base ---')
-    d = BaseDeterminant()
-    test(d, commands)
-
-    print(' --- spec command /start ---')
-    d = SpecificCommandDeterminant('/start')
-    test(d, commands)
-
-    print(' --- any command ---')
-    d = AnyCommandDeterminant()
-    test(d, commands)
-
-    print(' --- text ---')
-    d = TextDeterminant()
-    test(d, commands)
+    # commands = [
+    #     None,
+    #     '',
+    #     'start',
+    #     '/help',
+    #     'x123 /help',
+    #     '/help 1234',
+    #     '/start'
+    # ]
+    #
+    # def test(determinant, commands_):
+    #     for command in commands_:
+    #         print(f'{command} <> {determinant(text=command)}')
+    #
+    # print(' --- base ---')
+    # d = BaseDeterminant()
+    # test(d, commands)
+    #
+    # print(' --- spec command /start ---')
+    # d = SpecificCommandDeterminant('/start')
+    # test(d, commands)
+    #
+    # print(' --- any command ---')
+    # d = AnyCommandDeterminant()
+    # test(d, commands)
+    #
+    # print(' --- text ---')
+    # d = TextDeterminant()
+    # test(d, commands)
 
     pass

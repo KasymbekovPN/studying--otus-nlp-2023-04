@@ -2,20 +2,32 @@
 
 class User:
     INIT_STATE = 0
-    WAIT_STATE = 1
-    RUN_STATE = 2
+    QUESTION_STATE = 1
+    PASSAGE_STATE = 2
+    EXEC_STATE = 3
 
     UNDER_MIN_STATE = INIT_STATE - 1
-    OVER_MAX_STATE = RUN_STATE + 1
+    OVER_MAX_STATE = EXEC_STATE + 1
 
-    STATE_NAMES = {INIT_STATE: "INIT", WAIT_STATE: 'WAIT', RUN_STATE: 'RUN'}
+    STATE_NAMES = {
+        INIT_STATE: "INIT",
+        QUESTION_STATE: 'QUESTION',
+        PASSAGE_STATE: 'PASSAGE',
+        EXEC_STATE: 'EXEC'
+    }
 
     def __init__(self, user_id: int):
         self._id = user_id
-        self._state = User.INIT_STATE
+        self._state, self._question, self._passage = None, None, None
+        self.reset()
 
     def __repr__(self):
-        return f'User {{ id: {self._id}, state: {self.STATE_NAMES[self._state]} }}'
+        return f'User {{ id: {self._id}, state: {self.STATE_NAMES[self._state]}, question: {self._question}, passage: {self._passage} }}'
+
+    def reset(self):
+        self._state = User.INIT_STATE
+        self._question = None
+        self._passage = None
 
     @property
     def state(self) -> int:
@@ -32,6 +44,22 @@ class User:
     @id.setter
     def id(self, value):
         raise RuntimeError('id setter is unsupported')
+
+    @property
+    def question(self):
+        return self._question
+
+    @question.setter
+    def question(self, value: str):
+        self._question = value
+
+    @property
+    def passage(self):
+        return self._passage
+
+    @passage.setter
+    def passage(self, value: str):
+        self._passage = value
 
 
 # todo del

@@ -12,6 +12,15 @@ from src.hw_005_bot.message.processing.determinant.determinant import (
 )
 from src.hw_005_bot.user.users import Users
 from src.hw_005_bot.execution.task_queue import TaskQueue
+from src.hw_005_bot.engine.engine_strategies import (
+    BaseEngineStrategy,
+    StartCommandEngineStrategy,
+    QuestionCommandEngineStrategy,
+    PassageCommandEngineStrategy,
+    ExecCommandEngineStrategy,
+    UnknownCommandEngineStrategy,
+    TextEngineStrategy
+)
 
 
 HOST = 'localhost'
@@ -30,7 +39,16 @@ def run(host: str,
         task_queue: TaskQueue):
     bot = telebot.TeleBot(token)
     app = Flask(__name__)
-    engine = Engine(bot, determinant_chain, users, task_queue)
+    # todo del area start
+    # print(f'original bot: {bot}')
+    # print(f'original determinant_chain: {determinant_chain}')
+    # print(f'original users: {users}')
+    # print(f'original task_queue: {task_queue}')
+    # todo del area finish
+    engine = Engine(bot,
+                    determinant_chain,
+                    users,
+                    task_queue)
 
     def flask_abort():
         flask.abort(FLASK_ABORT_CODE)
@@ -52,15 +70,22 @@ def run(host: str,
 if __name__ == '__main__':
     bot_token = os.environ.get('DEV_TELEGRAM_BOT_TOKEN')
     if bot_token is not None:
-        # todo del
-        # m = Model()
         dc = DeterminantChain([
-            SpecificCommandDeterminant('/start'),
+            SpecificCommandDeterminant('/start', StartCommandEngineStrategy()),
+            SpecificCommandDeterminant('/passage', PassageCommandEngineStrategy()),
+            SpecificCommandDeterminant('/question', QuestionCommandEngineStrategy()),
+            SpecificCommandDeterminant('/exec', ExecCommandEngineStrategy()),
             AnyCommandDeterminant(),
             TextDeterminant()
         ])
         us = Users()
         tq = TaskQueue()
-        run(HOST, PORT, bot_token, dc, us, tq)
+        run(HOST,
+            PORT,
+            bot_token,
+            dc,
+            us,
+            tq
+        )
     else:
         print('DEV_TELEGRAM_BOT_TOKEN is absence is environment variables!')
