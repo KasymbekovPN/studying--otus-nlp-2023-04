@@ -1,9 +1,15 @@
 class DeterminationResult:
     KIND_UNKNOWN = -1
     KIND_COMMAND = 0
-    KIND_TEXT = 1
+    KIND_SPEC_COMMAND = 1
+    KIND_TEXT = 2
 
-    KIND_NAMES = {-1: 'UNKNOWN', 0: 'COMMAND', 1: 'TEXT'}
+    KIND_NAMES = {
+        KIND_UNKNOWN: 'UNKNOWN',
+        KIND_COMMAND: 'COMMAND',
+        KIND_SPEC_COMMAND: 'SPEC_COMMAND',
+        KIND_TEXT: 'TEXT'
+    }
 
     def __init__(self,
                  kind: int,
@@ -22,6 +28,11 @@ class DeterminationResult:
     @staticmethod
     def create_for_unknown(raw_text: str):
         r = DeterminationResult(DeterminationResult.KIND_UNKNOWN, raw_text, None, None)
+        return r
+
+    @staticmethod
+    def create_for_spec_command(raw_text: str, command: str):
+        r = DeterminationResult(DeterminationResult.KIND_SPEC_COMMAND, raw_text, command, None)
         return r
 
     @staticmethod

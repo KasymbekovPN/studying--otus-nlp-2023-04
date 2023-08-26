@@ -18,7 +18,7 @@ class SpecificCommandDeterminant(BaseDeterminant):
 
     def _determinate(self, text: str | None) -> DeterminationResult | None:
         if self._command == text:
-            return DeterminationResult.create_for_command(text, text[1:])
+            return DeterminationResult.create_for_spec_command(text, text[1:])
         return None
 
 
