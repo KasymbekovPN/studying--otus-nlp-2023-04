@@ -27,7 +27,7 @@ class StartCommandEngineStrategy(BaseEngineStrategy):
                 update: Update):
         user = users.get_or_add(user_id)
         user.reset()
-        bot.send_message(user_id, 'Привет, бот перезапущен.')
+        bot.send_message(user_id, 'Привет, я - перезапущен.')
 
 
 class QuestionCommandEngineStrategy(BaseEngineStrategy):
@@ -39,9 +39,8 @@ class QuestionCommandEngineStrategy(BaseEngineStrategy):
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)
-        user.reset()
         user.state = User.QUESTION_STATE
-        bot.send_message(user_id, 'Бот готов принять вопрос.')
+        bot.send_message(user_id, 'Я готов принять вопрос.')
 
 
 class PassageCommandEngineStrategy(BaseEngineStrategy):
@@ -52,8 +51,9 @@ class PassageCommandEngineStrategy(BaseEngineStrategy):
                 task_queue: TaskQueue,
                 users: Users,
                 update: Update):
-        # todo impl
-        bot.send_message(user_id, f'passage ECHO: {result}')
+        user = users.get_or_add(user_id)
+        user.state = User.PASSAGE_STATE
+        bot.send_message(user_id, 'Я готов принять пассаж.')
 
 
 class ExecCommandEngineStrategy(BaseEngineStrategy):
@@ -76,8 +76,9 @@ class UnknownCommandEngineStrategy(BaseEngineStrategy):
                 task_queue: TaskQueue,
                 users: Users,
                 update: Update):
-        # todo impl
-        bot.send_message(user_id, f'unknown ECHO: {result}')
+        user = users.get_or_add(user_id)
+        user.reset()
+        bot.send_message(user_id, f'Мне неизвестна команда {result.text}.')
 
 
 class TextEngineStrategy(BaseEngineStrategy):
