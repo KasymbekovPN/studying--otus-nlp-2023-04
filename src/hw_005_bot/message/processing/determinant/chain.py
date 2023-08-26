@@ -43,7 +43,7 @@ if __name__ == '__main__':
     ]
     chain = DeterminantChain(determinants_)
 
-    for text in texts:
-        print(f'{text} <> {chain(text=text)}')
+    for text_ in texts:
+        print(f'{text_} <> {chain(text=text_)}')
 
     pass
