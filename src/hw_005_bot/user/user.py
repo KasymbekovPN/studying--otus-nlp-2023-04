@@ -21,9 +21,8 @@ class User:
         self._state, self._question, self._passage = None, None, None
         self.reset()
 
-    # todo restore
-    # def __repr__(self):
-    #     return f'User {{ id: {self._id}, state: {self.STATE_NAMES[self._state]}, question: {self._question}, passage: {self._passage} }}'
+    def __repr__(self):
+        return f'User {{ id: {self._id}, state: {self.STATE_NAMES[self._state]}, question: {self._question}, passage: {self._passage} }}'
 
     def reset(self):
         self._state = User.INIT_STATE

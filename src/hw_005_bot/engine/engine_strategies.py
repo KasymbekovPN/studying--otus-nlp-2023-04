@@ -1,6 +1,7 @@
 from telebot import TeleBot
 from telebot.types import Update
 
+from src.hw_005_bot.user.user import User
 from src.hw_005_bot.user.users import Users
 from src.hw_005_bot.execution.task_queue import TaskQueue
 
@@ -26,7 +27,7 @@ class StartCommandEngineStrategy(BaseEngineStrategy):
                 update: Update):
         user = users.get_or_add(user_id)
         user.reset()
-        bot.send_message(user_id, f'Привет, бот перезапущен.')
+        bot.send_message(user_id, 'Привет, бот перезапущен.')
 
 
 class QuestionCommandEngineStrategy(BaseEngineStrategy):
@@ -37,8 +38,10 @@ class QuestionCommandEngineStrategy(BaseEngineStrategy):
                 task_queue: TaskQueue,
                 users: Users,
                 update: Update):
-        # todo impl
-        bot.send_message(user_id, f'question ECHO: {result}')
+        user = users.get_or_add(user_id)
+        user.reset()
+        user.state = User.QUESTION_STATE
+        bot.send_message(user_id, 'Бот готов принять вопрос.')
 
 
 class PassageCommandEngineStrategy(BaseEngineStrategy):
