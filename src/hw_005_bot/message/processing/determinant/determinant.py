@@ -46,49 +46,34 @@ class DefaultDeterminant(BaseDeterminant):
 # todo del
 if __name__ == '__main__':
 
-    # d = BaseDeterminant()
-    # print(d())
-    # print(d(text='hello'))
+    commands = [
+        None,
+        '',
+        'start',
+        '/help',
+        'x123 /help',
+        '/help 1234',
+        '/start'
+    ]
 
-    # s = 'hello'
-    # x = s.find('/')
-    # print(x)
+    def test(determinant, commands_):
+        for command in commands_:
+            print(f'{command} <> {determinant(text=command)}')
 
-    # d = SpecificCommandDeterminant('/start')
-    # commands = [
-    #     None,
-    #     '',
-    #     'start',
-    #     '/help',
-    #     '/start'
-    # ]
-    # for command in commands:
-    #     print(f'{command} <> {d(text=command)}')
+    print(' --- base ---')
+    d = BaseDeterminant()
+    test(d, commands)
 
-    # d = AnyCommandDeterminant()
-    # commands = [
-    #     None,
-    #     '',
-    #     'start',
-    #     '/help',
-    #     'x123 /help',
-    #     '/help 1234',
-    #     '/start'
-    # ]
-    # for command in commands:
-    #     print(f'{command} <> {d(text=command)}')
+    print(' --- spec command /start ---')
+    d = SpecificCommandDeterminant('/start')
+    test(d, commands)
 
-    # d = TextDeterminant()
-    # commands = [
-    #     None,
-    #     '',
-    #     'start',
-    #     '/help',
-    #     'x123 /help',
-    #     '/help 1234',
-    #     '/start'
-    # ]
-    # for command in commands:
-    #     print(f'{command} <> {d(text=command)}')
+    print(' --- any command ---')
+    d = AnyCommandDeterminant()
+    test(d, commands)
+
+    print(' --- text ---')
+    d = TextDeterminant()
+    test(d, commands)
 
     pass
