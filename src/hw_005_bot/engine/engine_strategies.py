@@ -1,4 +1,5 @@
 from telebot import TeleBot
+from telebot.types import Update
 
 from src.hw_005_bot.user.users import Users
 from src.hw_005_bot.execution.task_queue import TaskQueue
@@ -10,7 +11,8 @@ class BaseEngineStrategy:
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
+                users: Users,
+                update: Update):
         bot.send_message(user_id, f'ECHO: {result}')
 
 
@@ -20,14 +22,11 @@ class StartCommandEngineStrategy(BaseEngineStrategy):
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
-        # user = users.get_or_add(user_id)
-        # print(user)
-        # user1 = users.get_or_add(user_id)
-        # print(user1)
-        #
-        # # todo del
-        bot.send_message(user_id, f'start ECHO: {result}')
+                users: Users,
+                update: Update):
+        user = users.get_or_add(user_id)
+        user.reset()
+        bot.send_message(user_id, f'Привет, бот перезапущен.')
 
 
 class QuestionCommandEngineStrategy(BaseEngineStrategy):
@@ -36,7 +35,9 @@ class QuestionCommandEngineStrategy(BaseEngineStrategy):
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
+                users: Users,
+                update: Update):
+        # todo impl
         bot.send_message(user_id, f'question ECHO: {result}')
 
 
@@ -46,7 +47,9 @@ class PassageCommandEngineStrategy(BaseEngineStrategy):
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
+                users: Users,
+                update: Update):
+        # todo impl
         bot.send_message(user_id, f'passage ECHO: {result}')
 
 
@@ -56,7 +59,9 @@ class ExecCommandEngineStrategy(BaseEngineStrategy):
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
+                users: Users,
+                update: Update):
+        # todo impl
         bot.send_message(user_id, f'exec ECHO: {result}')
 
 
@@ -66,7 +71,9 @@ class UnknownCommandEngineStrategy(BaseEngineStrategy):
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
+                users: Users,
+                update: Update):
+        # todo impl
         bot.send_message(user_id, f'unknown ECHO: {result}')
 
 
@@ -76,7 +83,9 @@ class TextEngineStrategy(BaseEngineStrategy):
                 result,
                 bot: TeleBot,
                 task_queue: TaskQueue,
-                users: Users):
+                users: Users,
+                update: Update):
+        # todo impl
         bot.send_message(user_id, f'text ECHO: {result}')
 
 
