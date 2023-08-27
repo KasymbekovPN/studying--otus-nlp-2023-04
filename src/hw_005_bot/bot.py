@@ -1,10 +1,16 @@
 import os
 import flask
 import telebot
+import torch
 
 from telebot import TeleBot
 from queue import Queue
 from flask import Flask, request, Response
+from transformers import (
+    T5Tokenizer,
+    T5ForConditionalGeneration
+)
+
 from src.hw_005_bot.engine.engine import Engine
 from src.hw_005_bot.message.processing.determinant.chain import DeterminantChain
 from src.hw_005_bot.message.processing.determinant.determinant import (
@@ -29,19 +35,113 @@ FLASK_ABORT_CODE = 403
 ROUTE_RULE = '/'
 ROUTE_METHODS = ['POST', 'GET']
 ENCODING = 'utf-8'
+TOKEN_VAR_NAME = 'DEV_TELEGRAM_BOT_TOKEN'
+MODEL_CONFIG_PATH = './data/saved'
+MODEL_CONFIG_FILES = (
+    'config.json',
+    'generation_config.json',
+    'pytorch_model.bin',
+    'special_tokens_map.json',
+    'spiece.model',
+    'tokenizer_config.json'
+
+)
+QUEUE_MAX_SIZE = 100
 
 
-def run(bot: TeleBot,
+def create_queue(queue_max_size: int) -> tuple:
+    return None, Queue(maxsize=queue_max_size)
+
+
+def create_users() -> tuple:
+    return None, Users()
+
+
+def create_determinant_chain() -> tuple:
+    determinant_chain_ = DeterminantChain([
+        SpecificCommandDeterminant('/start', StartCommandEngineStrategy()),
+        SpecificCommandDeterminant('/passage', PassageCommandEngineStrategy()),
+        SpecificCommandDeterminant('/question', QuestionCommandEngineStrategy()),
+        SpecificCommandDeterminant('/exec', ExecCommandEngineStrategy()),
+        AnyCommandDeterminant(),
+        TextDeterminant()
+    ])
+    return None, determinant_chain_
+
+
+def create_bot(token_var_name: str) -> tuple:
+    token = os.environ.get(token_var_name)
+    token_presented = token is not None
+    bot_ = TeleBot(token) if token_presented else None
+    error_message_ = None if token_presented else f'{token_var_name}  is absence is environment variables!'
+
+    return error_message_, bot_
+
+
+def create_device():
+    if torch.cuda.is_available():
+        print(f'There are {torch.cuda.device_count()} GPU(s) available.')
+        print(f'We will use the GPU: {torch.cuda.get_device_name(0)}')
+        device_ = torch.device('cuda')
+    else:
+        print('No GPU available, using the GPU instead.')
+        device_ = torch.device('cpu')
+
+    return None, device_
+
+
+def create_model(model_config_path: str, model_config_files: tuple) -> tuple:
+    if len(model_config_files) == 0:
+        return 'Tuple of config files is empty', None
+
+    absence_files = set()
+    for file_name in model_config_files:
+        file_path = os.path.join(model_config_path, file_name)
+        if not os.path.isfile(file_path):
+            absence_files.add(file_path)
+
+    if len(absence_files) > 0:
+        return f'Some files does not exist: {absence_files}', None
+
+    model_ = Model(T5ForConditionalGeneration.from_pretrained(model_config_path),
+                   T5Tokenizer.from_pretrained(model_config_path))
+
+    return None, model_
+
+
+def check_and_create() -> tuple:
+    error_messages_ = []
+
+    def enrich_error_messages(em: str | None):
+        if em is not None:
+            error_messages_.append(em)
+
+    error_message_, queue_ = create_queue(QUEUE_MAX_SIZE)
+    enrich_error_messages(error_message_)
+
+    error_message_, users_ = create_users()
+    enrich_error_messages(error_message_)
+
+    error_message_, determinant_chain_ = create_determinant_chain()
+    enrich_error_messages(error_message_)
+
+    error_message_, bot_ = create_bot(TOKEN_VAR_NAME)
+    enrich_error_messages(error_message_)
+
+    error_message_, device_ = create_device()
+    enrich_error_messages(error_message_)
+
+    error_message_, model_ = create_model(MODEL_CONFIG_PATH, MODEL_CONFIG_FILES)
+    enrich_error_messages(error_message_)
+
+    return error_messages_, queue_, users_, determinant_chain_, bot_, device_, model_
+
+
+def run(engine: Engine,
         host: str,
-        port: int,
-        determinant_chain: DeterminantChain,
-        users: Users,
-        task_queue: Queue):
+        port: int):
+
     app = Flask(__name__)
-    engine = Engine(bot,
-                    determinant_chain,
-                    users,
-                    task_queue)
 
     def flask_abort():
         flask.abort(FLASK_ABORT_CODE)
@@ -61,36 +161,12 @@ def run(bot: TeleBot,
 
 
 if __name__ == '__main__':
-    bot_token = os.environ.get('DEV_TELEGRAM_BOT_TOKEN')
-    if bot_token is not None:
-        bot = TeleBot(bot_token)
-
-        dc = DeterminantChain([
-            SpecificCommandDeterminant('/start', StartCommandEngineStrategy()),
-            SpecificCommandDeterminant('/passage', PassageCommandEngineStrategy()),
-            SpecificCommandDeterminant('/question', QuestionCommandEngineStrategy()),
-            SpecificCommandDeterminant('/exec', ExecCommandEngineStrategy()),
-            AnyCommandDeterminant(),
-            TextDeterminant()
-        ])
-        us = Users()
-        tq = Queue()
-
-        m = Model()
-
-        start_pq_task_consumer(tq, m, bot)
-
-        # under run-method ???
-        run(bot,
-            HOST,
-            PORT,
-            dc,
-            us,
-            tq
-            )
-
-        tq.put(Task.create_shutdown_task())
-
-        print('DONE')
+    error_messages, queue, users, determinant_chain, bot, device, model = check_and_create()
+    if len(error_messages) == 0:
+        start_pq_task_consumer(queue, model, bot)
+        run(Engine(bot, determinant_chain, users, queue), HOST, PORT)
+        queue.put(Task.create_shutdown_task())
     else:
-        print('DEV_TELEGRAM_BOT_TOKEN is absence is environment variables!')
+        for error_message in error_messages:
+            print(f'[ERROR] {error_message}')
+    print('It is finished.')
