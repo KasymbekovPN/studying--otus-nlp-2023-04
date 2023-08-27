@@ -4,7 +4,8 @@ class User:
     INIT_STATE = 0
     QUESTION_STATE = 1
     PASSAGE_STATE = 2
-    EXEC_STATE = 3
+    TASK_STATE = 3
+    EXEC_STATE = 4
 
     UNDER_MIN_STATE = INIT_STATE - 1
     OVER_MAX_STATE = EXEC_STATE + 1
@@ -25,7 +26,12 @@ class User:
         return f'User {{ id: {self._id}, state: {self.STATE_NAMES[self._state]}, question: {self._question}, passage: {self._passage} }}'
 
     def reset(self):
-        self._state = User.INIT_STATE
+        self.state = User.INIT_STATE
+        self._question = None
+        self._passage = None
+
+    def reset_with_state(self, state: int):
+        self.state = state
         self._question = None
         self._passage = None
 

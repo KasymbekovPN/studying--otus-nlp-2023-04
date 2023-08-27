@@ -1,3 +1,5 @@
+import json
+
 from telebot import TeleBot
 from telebot.types import Update
 from queue import Queue
@@ -71,6 +73,7 @@ class ExecCommandEngineStrategy(BaseEngineStrategy):
             text = error_message
         else:
             task_queue.put(Task.create_pq_task(user.question, user.passage, user_id))
+            user.reset_with_state(User.EXEC_STATE)
             text = 'Задание добавлено в обработку.'
 
         bot.send_message(user_id, text)
@@ -86,6 +89,19 @@ class ExecCommandEngineStrategy(BaseEngineStrategy):
             error_message += '.'
 
         return error_message
+
+
+class TaskCommandEngineStrategy(BaseEngineStrategy):
+    def execute(self,
+                user_id: int,
+                result,
+                bot: TeleBot,
+                task_queue: Queue,
+                users: Users,
+                update: Update):
+        user = users.get_or_add(user_id)
+        user.reset_with_state(User.TASK_STATE)
+        bot.send_message(user_id, 'Я готов принять задание.')
 
 
 class UnknownCommandEngineStrategy(BaseEngineStrategy):
@@ -116,6 +132,11 @@ class TextEngineStrategy(BaseEngineStrategy):
         elif user.state == User.QUESTION_STATE:
             user.question = result.text
             text = self._create_passage_question_answer('Задан новый вопрос:', user)
+        elif user.state == User.TASK_STATE:
+            text, task = self._prepare_task(result.text)
+            if task is not None:
+                task_queue.put(Task.create_pq_task(task['question'], task["passage"], user_id))
+                user.reset_with_state(User.EXEC_STATE)
         else:
             text = 'Перед вводом вопроса или пассажа введите соответствующие команды ( /question /passage ).'
         bot.send_message(user_id, text)
@@ -123,6 +144,19 @@ class TextEngineStrategy(BaseEngineStrategy):
     @staticmethod
     def _create_passage_question_answer(title: str, user: User):
         return f'{title}\n\nТекущий вопрос:\n\n{user.question}\n\nТекущий пассаж:\n\n{user.passage}'
+
+    @staticmethod
+    def _prepare_task(line: str) -> tuple:
+        task = None
+        try:
+            task = json.loads(line)
+            text = 'Задание добавлено в обработку.' \
+                if 'question' in task and 'passage' in task \
+                else 'Задание не содержит question и/или passage.'
+        except Exception:
+            text = 'Задание имеет неверный формат.'
+
+        return text, task
 
 
 if __name__ == '__main__':
