@@ -22,7 +22,6 @@ from src.hw_005_bot.engine.engine_strategies import (
     TextEngineStrategy
 )
 
-
 HOST = 'localhost'
 PORT = 5000
 FLASK_ABORT_CODE = 403
@@ -86,6 +85,8 @@ if __name__ == '__main__':
             dc,
             us,
             tq
-        )
+            )
     else:
         print('DEV_TELEGRAM_BOT_TOKEN is absence is environment variables!')
+
+    print('DONE')
