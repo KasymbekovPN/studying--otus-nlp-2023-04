@@ -1,9 +1,9 @@
 from telebot import TeleBot
 from telebot.types import Update
+from queue import Queue
 
 from src.hw_005_bot.user.user import User
 from src.hw_005_bot.user.users import Users
-from src.hw_005_bot.execution.task_queue import TaskQueue
 from src.hw_005_bot.execution.task import Task
 
 
@@ -12,7 +12,7 @@ class BaseEngineStrategy:
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         bot.send_message(user_id, f'ECHO: {result}')
@@ -23,7 +23,7 @@ class StartCommandEngineStrategy(BaseEngineStrategy):
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)
@@ -36,7 +36,7 @@ class QuestionCommandEngineStrategy(BaseEngineStrategy):
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)
@@ -49,7 +49,7 @@ class PassageCommandEngineStrategy(BaseEngineStrategy):
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)
@@ -62,7 +62,7 @@ class ExecCommandEngineStrategy(BaseEngineStrategy):
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)
@@ -70,7 +70,7 @@ class ExecCommandEngineStrategy(BaseEngineStrategy):
         if error_message is not None:
             text = error_message
         else:
-            task_queue.put(Task.create_pq_task(user.question, user.passage))
+            task_queue.put(Task.create_pq_task(user.question, user.passage, user_id))
             text = 'Задание добавлено в обработку.'
 
         bot.send_message(user_id, text)
@@ -93,7 +93,7 @@ class UnknownCommandEngineStrategy(BaseEngineStrategy):
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)
@@ -106,7 +106,7 @@ class TextEngineStrategy(BaseEngineStrategy):
                 user_id: int,
                 result,
                 bot: TeleBot,
-                task_queue: TaskQueue,
+                task_queue: Queue,
                 users: Users,
                 update: Update):
         user = users.get_or_add(user_id)

@@ -1,9 +1,9 @@
 from telebot import TeleBot
 from telebot.types import Update
+from queue import Queue
 
 from src.hw_005_bot.message.processing.determinant.chain import DeterminantChain
 from src.hw_005_bot.user.users import Users
-from src.hw_005_bot.execution.task_queue import TaskQueue
 
 
 class Engine:
@@ -11,7 +11,7 @@ class Engine:
                  bot: TeleBot,
                  determinant_chain: DeterminantChain,
                  users: Users,
-                 task_queue: TaskQueue) -> None:
+                 task_queue: Queue) -> None:
         self.bot = bot
         self.determinant_chain = determinant_chain
         self.users = users

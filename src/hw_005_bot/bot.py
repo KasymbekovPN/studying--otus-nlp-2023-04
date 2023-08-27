@@ -2,6 +2,8 @@ import os
 import flask
 import telebot
 
+from telebot import TeleBot
+from queue import Queue
 from flask import Flask, request, Response
 from src.hw_005_bot.engine.engine import Engine
 from src.hw_005_bot.message.processing.determinant.chain import DeterminantChain
@@ -11,16 +13,15 @@ from src.hw_005_bot.message.processing.determinant.determinant import (
     TextDeterminant
 )
 from src.hw_005_bot.user.users import Users
-from src.hw_005_bot.execution.task_queue import TaskQueue
 from src.hw_005_bot.engine.engine_strategies import (
-    BaseEngineStrategy,
     StartCommandEngineStrategy,
     QuestionCommandEngineStrategy,
     PassageCommandEngineStrategy,
-    ExecCommandEngineStrategy,
-    UnknownCommandEngineStrategy,
-    TextEngineStrategy
+    ExecCommandEngineStrategy
 )
+from src.hw_005_bot.model.model import Model
+from src.hw_005_bot.execution.pq_task_consumer import start_pq_task_consumer
+from src.hw_005_bot.execution.task import Task
 
 HOST = 'localhost'
 PORT = 5000
@@ -30,20 +31,13 @@ ROUTE_METHODS = ['POST', 'GET']
 ENCODING = 'utf-8'
 
 
-def run(host: str,
+def run(bot: TeleBot,
+        host: str,
         port: int,
-        token: str,
         determinant_chain: DeterminantChain,
         users: Users,
-        task_queue: TaskQueue):
-    bot = telebot.TeleBot(token)
+        task_queue: Queue):
     app = Flask(__name__)
-    # todo del area start
-    # print(f'original bot: {bot}')
-    # print(f'original determinant_chain: {determinant_chain}')
-    # print(f'original users: {users}')
-    # print(f'original task_queue: {task_queue}')
-    # todo del area finish
     engine = Engine(bot,
                     determinant_chain,
                     users,
@@ -69,6 +63,8 @@ def run(host: str,
 if __name__ == '__main__':
     bot_token = os.environ.get('DEV_TELEGRAM_BOT_TOKEN')
     if bot_token is not None:
+        bot = TeleBot(bot_token)
+
         dc = DeterminantChain([
             SpecificCommandDeterminant('/start', StartCommandEngineStrategy()),
             SpecificCommandDeterminant('/passage', PassageCommandEngineStrategy()),
@@ -78,15 +74,23 @@ if __name__ == '__main__':
             TextDeterminant()
         ])
         us = Users()
-        tq = TaskQueue()
-        run(HOST,
+        tq = Queue()
+
+        m = Model()
+
+        start_pq_task_consumer(tq, m, bot)
+
+        # under run-method ???
+        run(bot,
+            HOST,
             PORT,
-            bot_token,
             dc,
             us,
             tq
             )
+
+        tq.put(Task.create_shutdown_task())
+
+        print('DONE')
     else:
         print('DEV_TELEGRAM_BOT_TOKEN is absence is environment variables!')
-
-    print('DONE')
