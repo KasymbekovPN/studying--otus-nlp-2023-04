@@ -18,6 +18,9 @@ class Engine:
         self.task_queue = task_queue
 
     def set_update(self, update: Update):
+        if update is None or update.message is None:
+            return
+
         text = update.message.text
         user_id = update.message.from_user.id
         result = self.determinant_chain(text=text)
