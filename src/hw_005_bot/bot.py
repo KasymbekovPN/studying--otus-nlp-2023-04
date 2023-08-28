@@ -24,7 +24,8 @@ from src.hw_005_bot.engine.engine_strategies import (
     QuestionCommandEngineStrategy,
     PassageCommandEngineStrategy,
     ExecCommandEngineStrategy,
-    TaskCommandEngineStrategy
+    TaskCommandEngineStrategy,
+    HelpCommandEngineStrategy
 )
 from src.hw_005_bot.model.model import Model
 from src.hw_005_bot.execution.pq_task_consumer import start_pq_task_consumer
@@ -66,6 +67,7 @@ def create_determinant_chain() -> tuple:
         SpecificCommandDeterminant('/question', QuestionCommandEngineStrategy()),
         SpecificCommandDeterminant('/exec', ExecCommandEngineStrategy()),
         SpecificCommandDeterminant('/task', TaskCommandEngineStrategy()),
+        SpecificCommandDeterminant('/help', HelpCommandEngineStrategy()),
         AnyCommandDeterminant(),
         TextDeterminant()
     ])

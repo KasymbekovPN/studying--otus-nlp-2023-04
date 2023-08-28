@@ -104,6 +104,52 @@ class TaskCommandEngineStrategy(BaseEngineStrategy):
         bot.send_message(user_id, 'Я готов принять задание.')
 
 
+class HelpCommandEngineStrategy(BaseEngineStrategy):
+    def execute(self,
+                user_id: int,
+                result,
+                bot: TeleBot,
+                task_queue: Queue,
+                users: Users,
+                update: Update):
+
+        answer = """Описание команд:
+/start
+
+    Стартовая команда, так же используется для сброса 
+    состояния.
+         
+/help
+
+    Команда для вывода справки.
+
+/passage
+    
+    Команда для перехода в состояние ввода пассажа.
+    После использования данной команды последний
+    введенный текст будет запоминаться как пассаж. 
+
+/question
+
+    Команда для перехода в состояние ввода вопроса.
+    После использования данной команды последний
+    введенный текст будет запоминаться как вопрос.
+
+/exec
+
+    Команда для перехода в состояние выполнения 
+    задания, состоящего из вопроса и пассажа.
+
+/task
+
+    Команда для введения и выполнения задания,
+    которое представляет собой json-строку.
+    
+    {"question": "...", "passage": "..."}
+"""
+        bot.send_message(user_id, answer)
+
+
 class UnknownCommandEngineStrategy(BaseEngineStrategy):
     def execute(self,
                 user_id: int,
