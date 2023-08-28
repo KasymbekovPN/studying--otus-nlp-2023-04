@@ -66,20 +66,3 @@ class User:
     @passage.setter
     def passage(self, value: str):
         self._passage = value
-
-
-# todo del
-if __name__ == '__main__':
-    states = [-2, -1, 0, 1, 2, 3, 4]
-
-    u = User(123)
-    print(f'init: {u.state}')
-    print()
-
-    for s in states:
-        print(f'prev: {u.state}')
-        print(f'set: {s}')
-        u.state = s
-        print(f'new: {u.state}')
-        print(u)
-        print()

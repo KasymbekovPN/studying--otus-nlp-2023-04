@@ -16,9 +16,7 @@ def consume_pq_task(queue: Queue, model: Model, bot: TeleBot):
         if task.kind == Task.KIND_PQ:
             result = task.get()
             exec_result = model.execute(result['question'], result['passage'])
-
-            # todo !!!
-            bot.send_message(result['user_id'], f'result: {exec_result}')
+            bot.send_message(result['user_id'], exec_result)
 
     print('\nPQ TASK CONSUMER is done.')
 

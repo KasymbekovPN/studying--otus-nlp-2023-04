@@ -43,39 +43,3 @@ class TextDeterminant(BaseDeterminant):
 
 class DefaultDeterminant(BaseDeterminant):
     pass
-
-
-# todo del
-if __name__ == '__main__':
-
-    # commands = [
-    #     None,
-    #     '',
-    #     'start',
-    #     '/help',
-    #     'x123 /help',
-    #     '/help 1234',
-    #     '/start'
-    # ]
-    #
-    # def test(determinant, commands_):
-    #     for command in commands_:
-    #         print(f'{command} <> {determinant(text=command)}')
-    #
-    # print(' --- base ---')
-    # d = BaseDeterminant()
-    # test(d, commands)
-    #
-    # print(' --- spec command /start ---')
-    # d = SpecificCommandDeterminant('/start')
-    # test(d, commands)
-    #
-    # print(' --- any command ---')
-    # d = AnyCommandDeterminant()
-    # test(d, commands)
-    #
-    # print(' --- text ---')
-    # d = TextDeterminant()
-    # test(d, commands)
-
-    pass

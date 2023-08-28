@@ -57,17 +57,3 @@ class Task:
     @staticmethod
     def create_pq_task(question: str, passage: str, user_id: int):
         return Task(Task.KIND_PQ, [question, passage, user_id])
-
-
-# todo del
-if __name__ == '__main__':
-    # question = 'some q?'
-    # passage = 'some p!'
-    #
-    # task = Task.create_pq_task(question, passage)
-    # print(task)
-
-    # task = Task.create_shutdown_task()
-    # print(task)
-
-    pass

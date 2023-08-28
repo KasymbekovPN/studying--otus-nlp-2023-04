@@ -48,6 +48,7 @@ MODEL_CONFIG_FILES = (
 
 )
 QUEUE_MAX_SIZE = 100
+MODEL_MAX_LENGTH = 300
 
 
 def create_queue(queue_max_size: int) -> tuple:
@@ -80,19 +81,7 @@ def create_bot(token_var_name: str) -> tuple:
     return error_message_, bot_
 
 
-def create_device():
-    if torch.cuda.is_available():
-        print(f'There are {torch.cuda.device_count()} GPU(s) available.')
-        print(f'We will use the GPU: {torch.cuda.get_device_name(0)}')
-        device_ = torch.device('cuda')
-    else:
-        print('No GPU available, using the GPU instead.')
-        device_ = torch.device('cpu')
-
-    return None, device_
-
-
-def create_model(model_config_path: str, model_config_files: tuple) -> tuple:
+def create_model(model_config_path: str, model_config_files: tuple, model_max_length) -> tuple:
     if len(model_config_files) == 0:
         return 'Tuple of config files is empty', None
 
@@ -105,8 +94,18 @@ def create_model(model_config_path: str, model_config_files: tuple) -> tuple:
     if len(absence_files) > 0:
         return f'Some files does not exist: {absence_files}', None
 
+    if torch.cuda.is_available():
+        print(f'There are {torch.cuda.device_count()} GPU(s) available.')
+        print(f'We will use the GPU: {torch.cuda.get_device_name(0)}')
+        device = torch.device('cuda')
+    else:
+        print('No GPU available, using the GPU instead.')
+        device = torch.device('cpu')
+
     model_ = Model(T5ForConditionalGeneration.from_pretrained(model_config_path),
-                   T5Tokenizer.from_pretrained(model_config_path))
+                   T5Tokenizer.from_pretrained(model_config_path),
+                   device,
+                   model_max_length)
 
     return None, model_
 
@@ -130,13 +129,10 @@ def check_and_create() -> tuple:
     error_message_, bot_ = create_bot(TOKEN_VAR_NAME)
     enrich_error_messages(error_message_)
 
-    error_message_, device_ = create_device()
+    error_message_, model_ = create_model(MODEL_CONFIG_PATH, MODEL_CONFIG_FILES, MODEL_MAX_LENGTH)
     enrich_error_messages(error_message_)
 
-    error_message_, model_ = create_model(MODEL_CONFIG_PATH, MODEL_CONFIG_FILES)
-    enrich_error_messages(error_message_)
-
-    return error_messages_, queue_, users_, determinant_chain_, bot_, device_, model_
+    return error_messages_, queue_, users_, determinant_chain_, bot_, model_
 
 
 def run(engine: Engine,
@@ -163,7 +159,7 @@ def run(engine: Engine,
 
 
 if __name__ == '__main__':
-    error_messages, queue, users, determinant_chain, bot, device, model = check_and_create()
+    error_messages, queue, users, determinant_chain, bot, model = check_and_create()
     if len(error_messages) == 0:
         start_pq_task_consumer(queue, model, bot)
         run(Engine(bot, determinant_chain, users, queue), HOST, PORT)
