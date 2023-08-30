@@ -37,23 +37,47 @@ def run1():
     embedder.to(get_device())
     # todo ? to gpu
     print(type(embedder))
+    # corpus = ['A man is eating food.',
+    #           'A man is eating a piece of bread.',
+    #           'The girl is carrying a baby.',
+    #           'A man is riding a horse.',
+    #           'A woman is playing violin.',
+    #           'Two men pushed carts through the woods.',
+    #           'A man is riding a white horse on an enclosed ground.',
+    #           'A monkey is playing drums.',
+    #           'A cheetah is running behind its prey.'
+    #           ]
+
     corpus = ['A man is eating food.',
+              'Мужчина ест еду',
               'A man is eating a piece of bread.',
+              'Мужчина ест кусок хлеба',
               'The girl is carrying a baby.',
+              'Девушка ухаживает за ребенком',
               'A man is riding a horse.',
+              'Мужчина скачет на лошади',
               'A woman is playing violin.',
+              'Женщина играет на скрипке',
               'Two men pushed carts through the woods.',
+              'Двое мужчин толкали тележки через лес.',
               'A man is riding a white horse on an enclosed ground.',
+              'Мужчина едет на белой лошади по огороженной территории.',
               'A monkey is playing drums.',
+              'Обезьяна играет на барабанах.',
               'A cheetah is running behind its prey.'
+              'Гепард бежит за своей добычей.'
               ]
+
     corpus_embeddings = embedder.encode(corpus, convert_to_tensor=True)
     print(corpus_embeddings.shape)
 
     queries = [
         'A man is eating pasta.',
+        'Мужчина ест пасту',
         'Someone in a gorilla costume is playing a set of drums.',
+        'Кто-то в костюме гориллы играет на барабанной установке.',
         'A cheetah chases prey on across a field.'
+        'Гепард преследует добычу по полю.'
     ]
 
     top_k = min(5, len(corpus))
