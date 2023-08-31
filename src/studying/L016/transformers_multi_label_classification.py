@@ -62,7 +62,6 @@ class BERTClass(torch.nn.Module):
         return output
 
 
-        # todo del
         # _, output_1 = self.l1(ids, attention_mask=mask, token_type_ids=token_type_ids)
         # _, output_1 = self.l1(ids, attention_mask=mask, token_type_ids=token_type_ids)
         # x = self.l1(ids, attention_mask=mask, token_type_ids=token_type_ids)
